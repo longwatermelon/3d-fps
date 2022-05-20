@@ -103,7 +103,7 @@ void mesh_read(struct Mesh *m, const char *fp)
 }
 
 
-void mesh_render(struct Mesh *m, SDL_Renderer *rend)
+void mesh_render(struct Mesh *m, SDL_Renderer *rend, struct Camera *c)
 {
     SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
 
@@ -115,6 +115,9 @@ void mesh_render(struct Mesh *m, SDL_Renderer *rend)
         for (int j = 0; j < 3; ++j)
         {
             Vec3f p = vec_addv(m->pts[m->tris[i].idx[j]], m->pos);
+            p = vec_sub(p, c->pos);
+
+            p = render_rotate_ccw(p, c->angle);
 
             if (p.z <= 1.f)
             {

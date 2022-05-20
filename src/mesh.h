@@ -2,6 +2,7 @@
 #define MESH_H
 
 #include "util.h"
+#include "camera.h"
 #include <SDL2/SDL.h>
 #include <sys/types.h>
 
@@ -30,7 +31,7 @@ void mesh_free(struct Mesh *m);
 
 void mesh_read(struct Mesh *m, const char *fp);
 
-void mesh_render(struct Mesh *m, SDL_Renderer *rend);
+void mesh_render(struct Mesh *m, SDL_Renderer *rend, struct Camera *c);
 
 #endif
 
