@@ -10,6 +10,8 @@ struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r)
     p->window = w;
     p->rend = r;
 
+    p->focused = false;
+
     p->player = player_alloc();
 
     return p;
@@ -33,6 +35,22 @@ void prog_mainloop(struct Prog *p)
     {
         prog_events(p, &evt);
 
+        SDL_Point mouse;
+        SDL_GetMouseState(&mouse.x, &mouse.y);
+
+        if (p->focused)
+        {
+            SDL_Point diff = {
+                mouse.x - 400,
+                mouse.y - 400
+            };
+
+            SDL_WarpMouseInWindow(p->window, 400, 400);
+
+            p->player->cam->angle.x += (float)diff.x / 200.f;
+            p->player->cam->angle.y -= (float)diff.y / 200.f;
+        }
+
         SDL_RenderClear(p->rend);
 
         mesh_render(m, p->rend, p->player->cam);
@@ -55,6 +73,20 @@ void prog_events(struct Prog *p, SDL_Event *evt)
         {
         case SDL_QUIT:
             p->running = false;
+            break;
+        case SDL_KEYDOWN:
+        {
+            switch (evt->key.keysym.sym)
+            {
+            case SDLK_ESCAPE:
+                p->focused = false;
+                SDL_ShowCursor(SDL_TRUE);
+                break;
+            }
+        } break;
+        case SDL_MOUSEBUTTONDOWN:
+            p->focused = true;
+            SDL_ShowCursor(SDL_FALSE);
             break;
         }
     }

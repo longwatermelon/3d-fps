@@ -12,6 +12,8 @@ struct Prog
     SDL_Window *window;
     SDL_Renderer *rend;
 
+    bool focused;
+
     struct Player *player;
 };
 
