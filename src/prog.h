@@ -1,7 +1,7 @@
 #ifndef PROG_H
 #define PROG_H
 
-#include "camera.h"
+#include "player.h"
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 
@@ -12,7 +12,7 @@ struct Prog
     SDL_Window *window;
     SDL_Renderer *rend;
 
-    struct Camera *cam;
+    struct Player *player;
 };
 
 struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r);
