@@ -61,6 +61,8 @@ void prog_mainloop(struct Prog *p)
             p->player->cam->angle.y -= (float)diff.y / 200.f;
         }
 
+        player_move(p->player, p->solids, p->nsolids);
+
         SDL_RenderClear(p->rend);
 
         for (size_t i = 0; i < p->nsolids; ++i)
@@ -131,12 +133,6 @@ void prog_events(struct Prog *p, SDL_Event *evt)
     if (keys[SDL_SCANCODE_SPACE]) move.y -= .1f;
     if (keys[SDL_SCANCODE_LSHIFT]) move.y += .1f;
 
-    Vec3f x = { move.x, 0.f, 0.f };
-    Vec3f y = { 0.f, move.y, 0.f };
-    Vec3f z = { 0.f, 0.f, move.z };
-
-    player_move(p->player, x, p->solids, p->nsolids);
-    player_move(p->player, y, p->solids, p->nsolids);
-    player_move(p->player, z, p->solids, p->nsolids);
+    p->player->vel = move;
 }
 
