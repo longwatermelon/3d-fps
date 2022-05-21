@@ -64,21 +64,6 @@ void prog_mainloop(struct Prog *p)
 
     while (p->running)
     {
-        for (size_t i = 0; i < p->nenemies; ++i)
-        {
-            if (p->enemies[i]->health <= 0)
-            {
-                enemy_free(p->enemies[i]);
-                memmove(p->enemies + i, p->enemies + i + 1, (--p->nenemies - i) * sizeof(struct Enemy*));
-            }
-        }
-
-        if (rand() % 500 < 1)
-        {
-            p->enemies = realloc(p->enemies, sizeof(struct Enemy*) * ++p->nenemies);
-            p->enemies[p->nenemies - 1] = enemy_alloc((Vec3f){ rand() % 40 - 20, rand() % 40 - 20, rand() % 40 - 20 });
-        }
-
         prog_events(p, &evt);
 
         SDL_Point mouse;
@@ -100,6 +85,26 @@ void prog_mainloop(struct Prog *p)
             };
 
             p->player->cam->angle = vec_addv(p->player->cam->angle, diff_a);
+        }
+
+        for (size_t i = 0; i < p->nenemies; ++i)
+        {
+            if (p->enemies[i]->health <= 0)
+            {
+                enemy_free(p->enemies[i]);
+                memmove(p->enemies + i, p->enemies + i + 1, (--p->nenemies - i) * sizeof(struct Enemy*));
+            }
+        }
+
+        if (rand() % 500 < 1)
+        {
+            p->enemies = realloc(p->enemies, sizeof(struct Enemy*) * ++p->nenemies);
+            p->enemies[p->nenemies - 1] = enemy_alloc((Vec3f){ rand() % 40 - 20, rand() % 40 - 20, rand() % 40 - 20 });
+        }
+
+        for (size_t i = 0; i < p->nenemies; ++i)
+        {
+            enemy_move(p->enemies[i], p->rend, vec_divf(vec_normalize(vec_sub(p->player->cam->pos, p->enemies[i]->pos)), 10.f));
         }
 
         player_move(p->player, p->solids, p->nsolids);

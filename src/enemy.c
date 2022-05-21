@@ -45,6 +45,15 @@ void enemy_render(struct Enemy *e, SDL_Renderer *rend, struct Camera *c)
 }
 
 
+void enemy_move(struct Enemy *e, SDL_Renderer *rend, Vec3f v)
+{
+    e->pos = vec_addv(e->pos, v);
+
+    e->body[0]->pos = vec_addv(e->body[0]->pos, v);
+    e->body[1]->pos = vec_addv(e->body[1]->pos, v);
+}
+
+
 bool enemy_ray_intersect(struct Enemy *e, Vec3f o, Vec3f dir, float *t)
 {
     float min = INFINITY;
