@@ -3,6 +3,7 @@
 
 #include "vector.h"
 #include "mesh.h"
+#include <time.h>
 #include <sys/types.h>
 
 struct Player
@@ -12,6 +13,10 @@ struct Player
 
     struct Mesh *gun;
     bool scoped;
+
+    int health;
+
+    clock_t last_hurt;
 };
 
 struct Player *player_alloc();
@@ -23,6 +28,8 @@ bool player_check_dir(struct Player *p, Vec3f dir, struct Mesh **solids, size_t 
 
 void player_render(struct Player *p, SDL_Renderer *rend);
 void player_animate_gun(struct Player *p);
+
+void player_hurt(struct Player *p, int damage);
 
 #endif
 

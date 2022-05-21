@@ -89,7 +89,7 @@ void prog_mainloop(struct Prog *p)
 
         for (size_t i = 0; i < p->nenemies; ++i)
         {
-            if (p->enemies[i]->dead && (clock() - p->enemies[i]->dead_time) / CLOCKS_PER_SEC >= 3)
+            if (p->enemies[i]->dead && (clock() - p->enemies[i]->dead_time) / CLOCKS_PER_SEC >= 1)
             {
                 enemy_free(p->enemies[i]);
                 memmove(p->enemies + i, p->enemies + i + 1, (--p->nenemies - i) * sizeof(struct Enemy*));
@@ -108,6 +108,15 @@ void prog_mainloop(struct Prog *p)
         }
 
         player_move(p->player, p->solids, p->nsolids);
+
+        for (size_t i = 0; i < p->nenemies; ++i)
+        {
+            if (vec_len(vec_sub(p->player->cam->pos, p->enemies[i]->pos)) <= 2.f)
+            {
+                if (!p->enemies[i]->dead)
+                    player_hurt(p->player, 1);
+            }
+        }
 
         SDL_RenderClear(p->rend);
 

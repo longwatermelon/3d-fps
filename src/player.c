@@ -13,6 +13,9 @@ struct Player *player_alloc()
     p->gun = mesh_alloc((Vec3f){ .3f, .5f, .8f }, (Vec3f){ 0.f, 0.f, 0.f }, "res/gun.obj", (SDL_Color){ 255, 255, 255 });
     p->scoped = false;
 
+    p->health = 3;
+    p->last_hurt = 0;
+
     return p;
 }
 
@@ -98,6 +101,14 @@ bool player_check_dir(struct Player *p, Vec3f dir, struct Mesh **solids, size_t 
 void player_render(struct Player *p, SDL_Renderer *rend)
 {
     mesh_render(p->gun, rend, p->cam);
+
+    if (clock() - p->last_hurt < CLOCKS_PER_SEC && clock() > CLOCKS_PER_SEC)
+    {
+        SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(rend, 255, 0, 0, (1.f - (float)(clock() - p->last_hurt) / (float)CLOCKS_PER_SEC) * 255.f);
+        SDL_RenderFillRect(rend, 0);
+        SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_NONE);
+    }
 }
 
 
@@ -112,5 +123,15 @@ void player_animate_gun(struct Player *p)
         p->gun->pos = vec_addv(p->gun->pos, vec_divf(vec_sub(normal, p->gun->pos), 5.f));
 
     p->gun->rot = vec_addv(p->gun->rot, vec_divf(vec_sub(p->cam->angle, p->gun->rot), 5.f));
+}
+
+
+void player_hurt(struct Player *p, int damage)
+{
+    if ((clock() - p->last_hurt) / CLOCKS_PER_SEC > 1)
+    {
+        p->health -= damage;
+        p->last_hurt = clock();
+    }
 }
 
