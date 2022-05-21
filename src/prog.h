@@ -2,6 +2,7 @@
 #define PROG_H
 
 #include "player.h"
+#include "mesh.h"
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 
@@ -15,6 +16,9 @@ struct Prog
     bool focused;
 
     struct Player *player;
+
+    struct Mesh **solids;
+    size_t nsolids;
 };
 
 struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r);

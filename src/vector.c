@@ -6,6 +6,9 @@ Vec3f vec_normalize(Vec3f v)
 {
     float len = vec_len(v);
 
+    if (len == 0.f)
+        return (Vec3f){ 0.f, 0.f, 0.f };
+
     return (Vec3f){
         .x = v.x / len,
         .y = v.y / len,

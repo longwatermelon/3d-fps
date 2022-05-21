@@ -14,6 +14,9 @@ struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r)
 
     p->player = player_alloc();
 
+    p->solids = 0;
+    p->nsolids = 0;
+
     return p;
 }
 
@@ -21,6 +24,12 @@ struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r)
 void prog_free(struct Prog *p)
 {
     player_free(p->player);
+
+    for (size_t i = 0; i < p->nsolids; ++i)
+        mesh_free(p->solids[i]);
+
+    free(p->solids);
+
     free(p);
 }
 
@@ -29,7 +38,8 @@ void prog_mainloop(struct Prog *p)
 {
     SDL_Event evt;
 
-    struct Mesh *m = mesh_alloc((Vec3f){ 0.f, 0.f, 5.f }, "res/donut.obj");
+    p->solids = realloc(p->solids, sizeof(struct Mesh) * ++p->nsolids);
+    p->solids[0] = mesh_alloc((Vec3f){ 0.f, 0.f, 5.f }, "res/donut.obj");
 
     while (p->running)
     {
@@ -53,13 +63,12 @@ void prog_mainloop(struct Prog *p)
 
         SDL_RenderClear(p->rend);
 
-        mesh_render(m, p->rend, p->player->cam);
+        for (size_t i = 0; i < p->nsolids; ++i)
+            mesh_render(p->solids[i], p->rend, p->player->cam);
 
         SDL_SetRenderDrawColor(p->rend, 0, 0, 0, 255);
         SDL_RenderPresent(p->rend);
     }
-
-    mesh_free(m);
 }
 
 
@@ -93,31 +102,35 @@ void prog_events(struct Prog *p, SDL_Event *evt)
 
     const Uint8* keys = SDL_GetKeyboardState(0);
 
+    Vec3f move = { 0.f, 0.f, 0.f };
+
     if (keys[SDL_SCANCODE_W])
     {
-        cam->pos.z += .1f * cosf(cam->angle.x);
-        cam->pos.x += .1f * sinf(cam->angle.x);
+        move.z += .1f * cosf(cam->angle.x);
+        move.x += .1f * sinf(cam->angle.x);
     }
 
     if (keys[SDL_SCANCODE_S])
     {
-        cam->pos.z -= .1f * cosf(cam->angle.x);
-        cam->pos.x -= .1f * sinf(cam->angle.x);
+        move.z -= .1f * cosf(cam->angle.x);
+        move.x -= .1f * sinf(cam->angle.x);
     }
 
     if (keys[SDL_SCANCODE_A])
     {
-        cam->pos.x += .1f * sinf(-M_PI / 2.f + cam->angle.x);
-        cam->pos.z += .1f * cosf(-M_PI / 2.f + cam->angle.x);
+        move.x += .1f * sinf(-M_PI / 2.f + cam->angle.x);
+        move.z += .1f * cosf(-M_PI / 2.f + cam->angle.x);
     }
 
     if (keys[SDL_SCANCODE_D])
     {
-        cam->pos.x -= .1f * sinf(-M_PI / 2.f + cam->angle.x);
-        cam->pos.z -= .1f * cosf(-M_PI / 2.f + cam->angle.x);
+        move.x -= .1f * sinf(-M_PI / 2.f + cam->angle.x);
+        move.z -= .1f * cosf(-M_PI / 2.f + cam->angle.x);
     }
 
-    if (keys[SDL_SCANCODE_SPACE]) cam->pos.y -= .1f;
-    if (keys[SDL_SCANCODE_LSHIFT]) cam->pos.y += .1f;
+    if (keys[SDL_SCANCODE_SPACE]) move.y -= .1f;
+    if (keys[SDL_SCANCODE_LSHIFT]) move.y += .1f;
+
+    player_move(p->player, move, p->solids, p->nsolids);
 }
 

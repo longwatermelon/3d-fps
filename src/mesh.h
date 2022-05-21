@@ -33,5 +33,11 @@ void mesh_read(struct Mesh *m, const char *fp);
 
 void mesh_render(struct Mesh *m, SDL_Renderer *rend, struct Camera *c);
 
+bool mesh_ray_intersect(struct Mesh *m, Vec3f ro, Vec3f rdir, float *t, Triangle *tri);
+bool mesh_ray_tri_intersect(struct Mesh *m, Triangle tri, Vec3f ro, Vec3f rdir, float *t);
+
+float mesh_point_shortest_dist(struct Mesh *m, Vec3f p);
+float mesh_point_shortest_dist_tri(struct Mesh *m, Triangle tri, Vec3f p);
+
 #endif
 
