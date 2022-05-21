@@ -1,4 +1,5 @@
 #include "prog.h"
+#include "render.h"
 #include "mesh.h"
 
 
@@ -61,8 +62,13 @@ void prog_mainloop(struct Prog *p)
 
             SDL_WarpMouseInWindow(p->window, 400, 400);
 
-            p->player->cam->angle.x += (float)diff.x / 200.f;
-            p->player->cam->angle.y -= (float)diff.y / 200.f;
+            Vec3f diff_a = {
+                (float)diff.x / 200.f,
+                -(float)diff.y / 200.f,
+                0.f
+            };
+
+            p->player->cam->angle = vec_addv(p->player->cam->angle, diff_a);
         }
 
         player_move(p->player, p->solids, p->nsolids);
@@ -71,6 +77,8 @@ void prog_mainloop(struct Prog *p)
 
         for (size_t i = 0; i < p->nsolids; ++i)
             mesh_render(p->solids[i], p->rend, p->player->cam);
+
+        player_render(p->player, p->rend);
 
         SDL_SetRenderDrawColor(p->rend, 0, 0, 0, 255);
         SDL_RenderPresent(p->rend);
