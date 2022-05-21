@@ -3,6 +3,7 @@
 
 #include "player.h"
 #include "mesh.h"
+#include "enemy.h"
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 
@@ -19,6 +20,9 @@ struct Prog
 
     struct Mesh **solids;
     size_t nsolids;
+
+    struct Enemy **enemies;
+    size_t nenemies;
 };
 
 struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r);

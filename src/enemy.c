@@ -9,6 +9,8 @@ struct Enemy *enemy_alloc(Vec3f pos)
     e->body[0] = mesh_alloc(e->pos, (Vec3f){ 1.f, 1.f, .8f }, "res/donut.obj", (SDL_Color){ 230, 150, 245 });
     e->body[1] = mesh_alloc(e->pos, (Vec3f){ .6f, 1.6f, 1.f }, "res/donut.obj", (SDL_Color){ 230, 150, 245 });
 
+    e->health = 5;
+
     return e;
 }
 

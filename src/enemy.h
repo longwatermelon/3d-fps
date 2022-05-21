@@ -8,6 +8,8 @@ struct Enemy
 {
     Vec3f pos;
     struct Mesh *body[2];
+
+    int health;
 };
 
 struct Enemy *enemy_alloc(Vec3f pos);

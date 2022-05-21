@@ -19,6 +19,9 @@ struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r)
     p->solids = 0;
     p->nsolids = 0;
 
+    p->enemies = 0;
+    p->nenemies = 0;
+
     return p;
 }
 
@@ -32,6 +35,11 @@ void prog_free(struct Prog *p)
 
     free(p->solids);
 
+    for (size_t i = 0; i < p->nenemies; ++i)
+        enemy_free(p->enemies[i]);
+
+    free(p->enemies);
+
     free(p);
 }
 
@@ -40,15 +48,18 @@ void prog_mainloop(struct Prog *p)
 {
     SDL_Event evt;
 
-    p->solids = realloc(p->solids, sizeof(struct Mesh) * ++p->nsolids);
-    p->solids = realloc(p->solids, sizeof(struct Mesh) * ++p->nsolids);
+    p->nsolids = 2;
+    p->solids = malloc(sizeof(struct Mesh*) * p->nsolids);
+
+    p->nenemies = 1;
+    p->enemies = malloc(sizeof(struct Enemy*) * p->nenemies);
 
     SDL_Color solid_col = { 200, 200, 200 };
 
     p->solids[0] = mesh_alloc((Vec3f){ 0.f, 5.f, 0.f }, (Vec3f){ .2f, .1f, .3f }, "res/plane.obj", solid_col);
     p->solids[1] = mesh_alloc((Vec3f){ 0.f, 0.f, 13.f }, (Vec3f){ .4f, .1f, .3f }, "res/big.obj", solid_col);
 
-    struct Enemy *e = enemy_alloc((Vec3f){ 0.f, 0.f, 5.f });
+    p->enemies[0] = enemy_alloc((Vec3f){ 0.f, 0.f, 5.f });
 
     while (p->running)
     {
@@ -82,14 +93,14 @@ void prog_mainloop(struct Prog *p)
         for (size_t i = 0; i < p->nsolids; ++i)
             mesh_render(p->solids[i], p->rend, p->player->cam);
 
-        enemy_render(e, p->rend, p->player->cam);
+        for (size_t i = 0; i < p->nenemies; ++i)
+            enemy_render(p->enemies[i], p->rend, p->player->cam);
+
         player_render(p->player, p->rend);
 
         SDL_SetRenderDrawColor(p->rend, 0, 0, 0, 255);
         SDL_RenderPresent(p->rend);
     }
-
-    enemy_free(e);
 }
 
 
