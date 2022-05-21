@@ -25,9 +25,11 @@ struct Mesh
     
     Vec3f *norms;
     size_t nnorms;
+
+    SDL_Color col;
 };
 
-struct Mesh *mesh_alloc(Vec3f pos, Vec3f rot, const char *fp);
+struct Mesh *mesh_alloc(Vec3f pos, Vec3f rot, const char *fp, SDL_Color col);
 void mesh_free(struct Mesh *m);
 
 void mesh_read(struct Mesh *m, const char *fp);

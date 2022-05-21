@@ -6,7 +6,7 @@
 #include <stdbool.h>
 
 
-struct Mesh *mesh_alloc(Vec3f pos, Vec3f rot, const char *fp)
+struct Mesh *mesh_alloc(Vec3f pos, Vec3f rot, const char *fp, SDL_Color col)
 {
     struct Mesh *m = malloc(sizeof(struct Mesh));
     m->pos = pos;
@@ -20,6 +20,8 @@ struct Mesh *mesh_alloc(Vec3f pos, Vec3f rot, const char *fp)
 
     m->norms = 0;
     m->nnorms = 0;
+
+    m->col = col;
 
     mesh_read(m, fp);
 
@@ -106,7 +108,7 @@ void mesh_read(struct Mesh *m, const char *fp)
 
 void mesh_render(struct Mesh *m, SDL_Renderer *rend, struct Camera *c)
 {
-    SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(rend, m->col.r, m->col.g, m->col.b, 255);
 
     for (size_t i = 0; i < m->ntris; ++i)
     {

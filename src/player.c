@@ -10,7 +10,7 @@ struct Player *player_alloc()
     p->cam = cam_alloc((Vec3f){ 0.f, 0.f, 0.f }, (Vec3f){ 0.f, 0.f, 0.f });
     p->vel = (Vec3f){ 0.f, 0.f, 0.f };
 
-    p->gun = mesh_alloc((Vec3f){ .3f, .5f, .8f }, (Vec3f){ 0.f, 0.f, 0.f }, "res/gun.obj");
+    p->gun = mesh_alloc((Vec3f){ .3f, .5f, .8f }, (Vec3f){ 0.f, 0.f, 0.f }, "res/gun.obj", (SDL_Color){ 255, 255, 255 });
     p->scoped = false;
 
     return p;

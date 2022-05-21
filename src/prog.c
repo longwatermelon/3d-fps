@@ -41,8 +41,11 @@ void prog_mainloop(struct Prog *p)
 
     p->solids = realloc(p->solids, sizeof(struct Mesh) * ++p->nsolids);
     p->solids = realloc(p->solids, sizeof(struct Mesh) * ++p->nsolids);
-    p->solids[0] = mesh_alloc((Vec3f){ 0.f, 5.f, 0.f }, (Vec3f){ .2f, .1f, .3f }, "res/plane.obj");
-    p->solids[1] = mesh_alloc((Vec3f){ 0.f, 0.f, 13.f }, (Vec3f){ .4f, .1f, .3f }, "res/big.obj");
+
+    SDL_Color solid_col = { 200, 200, 200 };
+
+    p->solids[0] = mesh_alloc((Vec3f){ 0.f, 5.f, 0.f }, (Vec3f){ .2f, .1f, .3f }, "res/plane.obj", solid_col);
+    p->solids[1] = mesh_alloc((Vec3f){ 0.f, 0.f, 13.f }, (Vec3f){ .4f, .1f, .3f }, "res/big.obj", solid_col);
 
     while (p->running)
     {
