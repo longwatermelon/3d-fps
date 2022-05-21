@@ -11,6 +11,7 @@ struct Player *player_alloc()
     p->vel = (Vec3f){ 0.f, 0.f, 0.f };
 
     p->gun = mesh_alloc((Vec3f){ .3f, .5f, .8f }, (Vec3f){ 0.f, 0.f, 0.f }, "res/gun.obj");
+    p->scoped = false;
 
     return p;
 }
@@ -28,8 +29,6 @@ void player_move(struct Player *p, struct Mesh **solids, size_t nsolids)
 {
     p->vel.y += .0098f;
 
-//    printf("%f\n", p->vel.y);
-
     Vec3f x = { p->vel.x, 0.f, 0.f };
     Vec3f y = { 0.f, p->vel.y, 0.f };
     Vec3f z = { 0.f, 0.f, p->vel.z };
@@ -40,7 +39,10 @@ void player_move(struct Player *p, struct Mesh **solids, size_t nsolids)
 
     if (!player_move_dir(p, z, solids, nsolids, .5f)) p->vel.z = 0.f;
 
-    p->gun->pos = vec_addv(p->cam->pos, (Vec3f){ .3f, .5f, .8f });
+    if (p->scoped)
+        p->gun->pos = vec_addv(p->cam->pos, (Vec3f){ 0.f, .4f, .6f });
+    else
+        p->gun->pos = vec_addv(p->cam->pos, (Vec3f){ .3f, .5f, .8f });
 
     p->gun->pos = vec_addv(p->cam->pos, render_rotate_cc(vec_sub(p->gun->pos, p->cam->pos), p->cam->angle));
     p->gun->rot = p->cam->angle;

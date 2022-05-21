@@ -11,6 +11,7 @@ struct Player
     Vec3f vel;
 
     struct Mesh *gun;
+    bool scoped;
 };
 
 struct Player *player_alloc();

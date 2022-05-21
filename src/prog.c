@@ -117,6 +117,15 @@ void prog_events(struct Prog *p, SDL_Event *evt)
         case SDL_MOUSEBUTTONDOWN:
             p->focused = true;
             SDL_ShowCursor(SDL_FALSE);
+
+            if (evt->button.button == SDL_BUTTON_LEFT)
+            {
+            }
+
+            if (evt->button.button == SDL_BUTTON_RIGHT)
+            {
+                p->player->scoped = !p->player->scoped;
+            }
             break;
         }
     }
