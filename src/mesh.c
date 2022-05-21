@@ -202,32 +202,6 @@ bool mesh_ray_tri_intersect(struct Mesh *m, Triangle tri, Vec3f ro, Vec3f rdir, 
 
 float mesh_point_shortest_dist(struct Mesh *m, Vec3f p)
 {
-#if 0
-    float min = INFINITY;
-
-    for (size_t i = 0; i < m->ntris; ++i)
-    {
-        if (mesh_point_shortest_dist_tri(m, m->tris[i], p, t))
-        {
-            Vec3f point = vec_addv(p, vec_mulf(m->norms[m->tris[i].nidx], *t));
-            Vec3f dir = vec_normalize(vec_sub(point, p));
-//            printf("%f %f %f\n", dir.x, dir.y, dir.z);
-
-            float dist;
-            if (mesh_ray_tri_intersect(m, m->tris[i], p, dir, &dist))
-            {
-                if (*t < min)
-                {
-                    min = *t;
-                    printf("%f\n", min);
-                }
-            }
-        }
-    }
-
-    return min != INFINITY;
-#endif
-
     float t = INFINITY;
 
     for (size_t i = 0; i < m->ntris; ++i)
@@ -238,7 +212,6 @@ float mesh_point_shortest_dist(struct Mesh *m, Vec3f p)
             t = dist;
     }
 
-//    printf("t = %f\n", t);
     return t;
 }
 

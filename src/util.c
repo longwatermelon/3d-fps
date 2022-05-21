@@ -29,12 +29,6 @@ float util_tri_area(Vec3f points[3])
 
 Vec3f util_barycentric_coefficients(Vec3f points[3], Vec3f p)
 {
-#if 0
-    Vec3f x[3] = { p, points[1], points[2] };
-    Vec3f y[3] = { p, points[0], points[2] };
-    Vec3f z[3] = { p, points[1], points[0] };
-#endif
-
     Vec3f ba = vec_sub(points[1], points[0]);
     Vec3f ca = vec_sub(points[2], points[0]);
 
@@ -65,10 +59,6 @@ Vec3f util_barycentric_coefficients(Vec3f points[3], Vec3f p)
 
 float util_p_line_sdist(Vec3f p, Vec3f p0, Vec3f p1)
 {
-#if 0
-    float dist = vec_len(vec_cross(vec_sub(p1, p0), vec_sub(p0, p))) / vec_len(vec_sub(p1, p0));
-    return dist;
-#endif
     float len = vec_len(vec_sub(p1, p0));
     float t = vec_dot(vec_sub(p1, p0), vec_sub(p, p0)) / len;
 
