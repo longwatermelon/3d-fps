@@ -89,14 +89,14 @@ void prog_mainloop(struct Prog *p)
 
         for (size_t i = 0; i < p->nenemies; ++i)
         {
-            if (p->enemies[i]->health <= 0)
+            if (p->enemies[i]->dead && (clock() - p->enemies[i]->dead_time) / CLOCKS_PER_SEC >= 3)
             {
                 enemy_free(p->enemies[i]);
                 memmove(p->enemies + i, p->enemies + i + 1, (--p->nenemies - i) * sizeof(struct Enemy*));
             }
         }
 
-        if (rand() % 500 < 1)
+        if (rand() % 300 < 1)
         {
             p->enemies = realloc(p->enemies, sizeof(struct Enemy*) * ++p->nenemies);
             p->enemies[p->nenemies - 1] = enemy_alloc((Vec3f){ rand() % 40 - 20, rand() % 40 - 20, rand() % 40 - 20 });
@@ -178,6 +178,12 @@ void prog_events(struct Prog *p, SDL_Event *evt)
 
                     e->body[0]->col = red;
                     e->body[1]->col = red;
+
+                    if (e->health == 0)
+                    {
+                        e->dead = true;
+                        e->dead_time = clock();
+                    }
                 }
             }
 

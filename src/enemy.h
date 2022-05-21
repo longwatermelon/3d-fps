@@ -3,6 +3,7 @@
 
 #include "util.h"
 #include "mesh.h"
+#include <time.h>
 
 struct Enemy
 {
@@ -10,6 +11,10 @@ struct Enemy
     struct Mesh *body[2];
 
     int health;
+    bool dead;
+
+    clock_t dead_time;
+    Vec3f dead_animations[2];
 };
 
 struct Enemy *enemy_alloc(Vec3f pos);

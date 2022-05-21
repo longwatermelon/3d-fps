@@ -10,6 +10,20 @@ struct Enemy *enemy_alloc(Vec3f pos)
     e->body[1] = mesh_alloc(e->pos, (Vec3f){ .6f, 1.6f, 1.f }, "res/donut.obj", (SDL_Color){ 230, 150, 245 });
 
     e->health = 5;
+    e->dead_time = clock();
+    e->dead = false;
+
+    e->dead_animations[0] = (Vec3f){
+        (float)(rand() % 100 - 50) / 100.f,
+        (float)(rand() % 100 - 50) / 100.f,
+        (float)(rand() % 100 - 50) / 100.f
+    };
+
+    e->dead_animations[1] = (Vec3f){
+        (float)(rand() % 100 - 50) / 100.f,
+        (float)(rand() % 100 - 50) / 100.f,
+        (float)(rand() % 100 - 50) / 100.f
+    };
 
     return e;
 }
@@ -33,7 +47,17 @@ void enemy_render(struct Enemy *e, SDL_Renderer *rend, struct Camera *c)
             e->body[i]->col.b
         };
 
-        col = vec_addv(col, vec_divf(vec_sub((Vec3f){ 230, 150, 245 }, col), 10.f));
+        if (e->dead)
+        {
+            col = vec_addv(col, vec_divf(vec_sub((Vec3f){ 0, 0, 0 }, col), 50.f));
+            e->body[i]->pos = vec_addv(e->body[i]->pos, e->dead_animations[i]);
+            e->dead_animations[i].y += .0098f;
+        }
+        else
+        {
+            col = vec_addv(col, vec_divf(vec_sub((Vec3f){ 230, 150, 245 }, col), 10.f));
+        }
+
         e->body[i]->col = (SDL_Color){ col.x, col.y, col.z };
     }
 
@@ -56,6 +80,9 @@ void enemy_move(struct Enemy *e, SDL_Renderer *rend, Vec3f v)
 
 bool enemy_ray_intersect(struct Enemy *e, Vec3f o, Vec3f dir, float *t)
 {
+    if (e->dead)
+        return false;
+
     float min = INFINITY;
 
     for (size_t i = 0; i < 2; ++i)
