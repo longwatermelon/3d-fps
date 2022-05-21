@@ -31,6 +31,11 @@ void prog_free(struct Prog *p);
 void prog_mainloop(struct Prog *p);
 void prog_events(struct Prog *p, SDL_Event *evt);
 
+void prog_mouse(struct Prog *p);
+void prog_enemies(struct Prog *p);
+void prog_player(struct Prog *p);
+void prog_render(struct Prog *p);
+
 bool prog_player_shoot(struct Prog *p, struct Enemy **e);
 
 #endif

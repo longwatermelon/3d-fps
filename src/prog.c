@@ -65,75 +65,14 @@ void prog_mainloop(struct Prog *p)
     while (p->running)
     {
         prog_events(p, &evt);
+        prog_mouse(p);
 
-        SDL_Point mouse;
-        SDL_GetMouseState(&mouse.x, &mouse.y);
-
-        if (p->focused)
-        {
-            SDL_Point diff = {
-                mouse.x - 400,
-                mouse.y - 400
-            };
-
-            SDL_WarpMouseInWindow(p->window, 400, 400);
-
-            Vec3f diff_a = {
-                (float)diff.x / 200.f,
-                -(float)diff.y / 200.f,
-                0.f
-            };
-
-            p->player->cam->angle = vec_addv(p->player->cam->angle, diff_a);
-        }
-
-        for (size_t i = 0; i < p->nenemies; ++i)
-        {
-            if (p->enemies[i]->dead && (clock() - p->enemies[i]->dead_time) / CLOCKS_PER_SEC >= 1)
-            {
-                enemy_free(p->enemies[i]);
-                memmove(p->enemies + i, p->enemies + i + 1, (--p->nenemies - i) * sizeof(struct Enemy*));
-            }
-        }
-
-        if (rand() % 300 < 1)
-        {
-            p->enemies = realloc(p->enemies, sizeof(struct Enemy*) * ++p->nenemies);
-            p->enemies[p->nenemies - 1] = enemy_alloc((Vec3f){ rand() % 40 - 20, rand() % 40 - 20, rand() % 40 - 20 });
-        }
-
-        for (size_t i = 0; i < p->nenemies; ++i)
-        {
-            enemy_move(p->enemies[i], p->rend, vec_divf(vec_normalize(vec_sub(p->player->cam->pos, p->enemies[i]->pos)), 10.f));
-        }
-
-        player_move(p->player, p->solids, p->nsolids);
-
-        for (size_t i = 0; i < p->nenemies; ++i)
-        {
-            if (vec_len(vec_sub(p->player->cam->pos, p->enemies[i]->pos)) <= 2.f)
-            {
-                if (!p->enemies[i]->dead)
-                    player_hurt(p->player, 1);
-            }
-        }
+        prog_player(p);
+        prog_enemies(p);
 
         SDL_RenderClear(p->rend);
 
-        for (size_t i = 0; i < p->nsolids; ++i)
-            mesh_render(p->solids[i], p->rend, p->player->cam);
-
-        for (size_t i = 0; i < p->nenemies; ++i)
-            enemy_render(p->enemies[i], p->rend, p->player->cam);
-
-        player_render(p->player, p->rend);
-
-        if (p->player->scoped)
-        {
-            SDL_SetRenderDrawColor(p->rend, 255, 255, 255, 255);
-            SDL_RenderDrawLine(p->rend, 400 - 10, 400 - 10, 400 + 10, 400 + 10);
-            SDL_RenderDrawLine(p->rend, 400 + 10, 400 - 10, 400 - 10, 400 + 10);
-        }
+        prog_render(p);
 
         SDL_SetRenderDrawColor(p->rend, 0, 0, 0, 255);
         SDL_RenderPresent(p->rend);
@@ -235,6 +174,89 @@ void prog_events(struct Prog *p, SDL_Event *evt)
 
     p->player->vel.x = move.x;
     p->player->vel.z = move.z;
+}
+
+
+void prog_mouse(struct Prog *p)
+{
+    SDL_Point mouse;
+    SDL_GetMouseState(&mouse.x, &mouse.y);
+
+    if (p->focused)
+    {
+        SDL_Point diff = {
+            mouse.x - 400,
+            mouse.y - 400
+        };
+
+        SDL_WarpMouseInWindow(p->window, 400, 400);
+
+        Vec3f diff_a = {
+            (float)diff.x / 200.f,
+            -(float)diff.y / 200.f,
+            0.f
+        };
+
+        p->player->cam->angle = vec_addv(p->player->cam->angle, diff_a);
+    }
+}
+
+
+void prog_enemies(struct Prog *p)
+{
+    for (size_t i = 0; i < p->nenemies; ++i)
+    {
+        if (p->enemies[i]->dead && (clock() - p->enemies[i]->dead_time) / CLOCKS_PER_SEC >= 1)
+        {
+            enemy_free(p->enemies[i]);
+            memmove(p->enemies + i, p->enemies + i + 1, (--p->nenemies - i) * sizeof(struct Enemy*));
+        }
+    }
+
+    if (rand() % 300 < 1)
+    {
+        p->enemies = realloc(p->enemies, sizeof(struct Enemy*) * ++p->nenemies);
+        p->enemies[p->nenemies - 1] = enemy_alloc((Vec3f){ rand() % 40 - 20, rand() % 40 - 20, rand() % 40 - 20 });
+    }
+
+    for (size_t i = 0; i < p->nenemies; ++i)
+    {
+        enemy_move(p->enemies[i], p->rend, vec_divf(vec_normalize(vec_sub(p->player->cam->pos, p->enemies[i]->pos)), 10.f));
+    }
+}
+
+
+void prog_player(struct Prog *p)
+{
+    player_move(p->player, p->solids, p->nsolids);
+
+    for (size_t i = 0; i < p->nenemies; ++i)
+    {
+        if (vec_len(vec_sub(p->player->cam->pos, p->enemies[i]->pos)) <= 2.f)
+        {
+            if (!p->enemies[i]->dead)
+                player_hurt(p->player, 1);
+        }
+    }
+}
+
+
+void prog_render(struct Prog *p)
+{
+    for (size_t i = 0; i < p->nsolids; ++i)
+        mesh_render(p->solids[i], p->rend, p->player->cam);
+
+    for (size_t i = 0; i < p->nenemies; ++i)
+        enemy_render(p->enemies[i], p->rend, p->player->cam);
+
+    player_render(p->player, p->rend);
+
+    if (p->player->scoped)
+    {
+        SDL_SetRenderDrawColor(p->rend, 255, 255, 255, 255);
+        SDL_RenderDrawLine(p->rend, 400 - 10, 400 - 10, 400 + 10, 400 + 10);
+        SDL_RenderDrawLine(p->rend, 400 + 10, 400 - 10, 400 - 10, 400 + 10);
+    }
 }
 
 
