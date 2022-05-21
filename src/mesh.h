@@ -27,6 +27,7 @@ struct Mesh
     size_t nnorms;
 
     SDL_Color col;
+    bool bculling;
 };
 
 struct Mesh *mesh_alloc(Vec3f pos, Vec3f rot, const char *fp, SDL_Color col);

@@ -44,17 +44,6 @@ void player_move(struct Player *p, struct Mesh **solids, size_t nsolids)
     if (!player_move_dir(p, z, solids, nsolids, .5f)) p->vel.z = 0.f;
 
     player_animate_gun(p);
-#if 0
-    if (p->scoped)
-        p->gun->pos = vec_addv(p->cam->pos, (Vec3f){ 0.f, .4f, .6f });
-    else
-        p->gun->pos = vec_addv(p->cam->pos, (Vec3f){ .3f, .5f, .8f });
-
-    p->gun->pos = vec_addv(p->cam->pos, render_rotate_cc(vec_sub(p->gun->pos, p->cam->pos), p->cam->angle));
-
-    p->gun->rot = p->cam->angle;
-
-#endif
 }
 
 
@@ -123,7 +112,5 @@ void player_animate_gun(struct Player *p)
         p->gun->pos = vec_addv(p->gun->pos, vec_divf(vec_sub(normal, p->gun->pos), 5.f));
 
     p->gun->rot = vec_addv(p->gun->rot, vec_divf(vec_sub(p->cam->angle, p->gun->rot), 5.f));
-
-//    p->gun->pos = vec_addv(p->cam->pos, render_rotate_cc(vec_sub(p->gun->pos, p->cam->pos), p->cam->angle));
 }
 

@@ -22,6 +22,7 @@ struct Mesh *mesh_alloc(Vec3f pos, Vec3f rot, const char *fp, SDL_Color col)
     m->nnorms = 0;
 
     m->col = col;
+    m->bculling = true;
 
     mesh_read(m, fp);
 
@@ -112,6 +113,15 @@ void mesh_render(struct Mesh *m, SDL_Renderer *rend, struct Camera *c)
 
     for (size_t i = 0; i < m->ntris; ++i)
     {
+        if (m->bculling)
+        {
+            Vec3f v = vec_addv(render_rotate_cc(m->pts[m->tris[i].idx[0]], m->rot), m->pos);
+            Vec3f vp = vec_sub(v, c->pos);
+
+            if (vec_dot(vp, render_rotate_cc(m->norms[m->tris[i].nidx], m->rot)) >= 0.f)
+                continue;
+        }
+
         SDL_Point points[3];
         bool render = true;
 
