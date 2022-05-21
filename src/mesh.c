@@ -6,11 +6,11 @@
 #include <stdbool.h>
 
 
-struct Mesh *mesh_alloc(Vec3f pos, const char *fp)
+struct Mesh *mesh_alloc(Vec3f pos, Vec3f rot, const char *fp)
 {
     struct Mesh *m = malloc(sizeof(struct Mesh));
     m->pos = pos;
-    m->rot = (Vec3f){ 0.f, 0.f, 0.f };
+    m->rot = rot;
 
     m->pts = 0;
     m->npts = 0;
