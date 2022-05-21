@@ -37,12 +37,16 @@ void player_move(struct Player *p, struct Mesh **solids, size_t nsolids)
     if (!player_move_dir(p, y, solids, nsolids, 2.f)) p->vel.y = 0.f;
     if (!player_move_dir(p, z, solids, nsolids, .5f)) p->vel.z = 0.f;
 
+    player_animate_gun(p);
+#if 0
     if (p->scoped)
         p->gun->pos = vec_addv(p->cam->pos, (Vec3f){ 0.f, .4f, .6f });
     else
         p->gun->pos = vec_addv(p->cam->pos, (Vec3f){ .3f, .5f, .8f });
 
     p->gun->pos = vec_addv(p->cam->pos, render_rotate_cc(vec_sub(p->gun->pos, p->cam->pos), p->cam->angle));
+
+#endif
     p->gun->rot = p->cam->angle;
 }
 
@@ -50,11 +54,13 @@ void player_move(struct Player *p, struct Mesh **solids, size_t nsolids)
 bool player_move_dir(struct Player *p, Vec3f dir, struct Mesh **solids, size_t nsolids, float bound)
 {
     float min;
+    Vec3f diff = p->cam->pos;
+    bool move;
 
     if (player_check_dir(p, dir, solids, nsolids, bound, &min))
     {
         p->cam->pos = vec_addv(p->cam->pos, dir);
-        return true;
+        move = true;
     }
     else
     {
@@ -63,8 +69,13 @@ bool player_move_dir(struct Player *p, Vec3f dir, struct Mesh **solids, size_t n
 
         float diff = dist - bound;
         p->cam->pos = vec_addv(p->cam->pos, vec_mulf(vec_normalize(dir), diff));
-        return false;
+        move = false;
     }
+
+    diff = vec_sub(p->cam->pos, diff);
+    p->gun->pos = vec_addv(p->gun->pos, diff);
+
+    return move;
 }
 
 
@@ -91,5 +102,19 @@ bool player_check_dir(struct Player *p, Vec3f dir, struct Mesh **solids, size_t 
 void player_render(struct Player *p, SDL_Renderer *rend)
 {
     mesh_render(p->gun, rend, p->cam);
+}
+
+
+void player_animate_gun(struct Player *p)
+{
+    Vec3f scoped = vec_addv(p->cam->pos, render_rotate_cc((Vec3f){ 0.f, .4f, .6f }, p->cam->angle));
+    Vec3f normal = vec_addv(p->cam->pos, render_rotate_cc((Vec3f){ .35f, .5f, .8f }, p->cam->angle));
+
+    if (p->scoped)
+        p->gun->pos = vec_addv(p->gun->pos, vec_divf(vec_sub(scoped, p->gun->pos), 5.f));
+    else
+        p->gun->pos = vec_addv(p->gun->pos, vec_divf(vec_sub(normal, p->gun->pos), 5.f));
+
+//    p->gun->pos = vec_addv(p->cam->pos, render_rotate_cc(vec_sub(p->gun->pos, p->cam->pos), p->cam->angle));
 }
 

@@ -12,6 +12,7 @@ struct Player
 
     struct Mesh *gun;
     bool scoped;
+    bool gun_moving;
 };
 
 struct Player *player_alloc();
@@ -22,6 +23,7 @@ bool player_move_dir(struct Player *p, Vec3f dir, struct Mesh **solids, size_t n
 bool player_check_dir(struct Player *p, Vec3f dir, struct Mesh **solids, size_t nsolids, float bound, float *min);
 
 void player_render(struct Player *p, SDL_Renderer *rend);
+void player_animate_gun(struct Player *p);
 
 #endif
 
