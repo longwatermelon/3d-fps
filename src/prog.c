@@ -8,11 +8,14 @@ struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r)
 {
     struct Prog *p = malloc(sizeof(struct Prog));
     p->running = true;
+    p->restart = false;
 
     p->window = w;
     p->rend = r;
 
-    p->focused = false;
+    SDL_WarpMouseInWindow(p->window, 400, 400);
+    SDL_ShowCursor(SDL_FALSE);
+    p->focused = true;
 
     p->player = player_alloc();
 
@@ -64,15 +67,33 @@ void prog_mainloop(struct Prog *p)
 
     while (p->running)
     {
-        prog_events(p, &evt);
-        prog_mouse(p);
+        if (p->player->health > 0)
+            prog_events(p, &evt);
+        else
+        {
+            while (SDL_PollEvent(&evt))
+                prog_events_base(p, &evt);
+        }
 
-        prog_player(p);
-        prog_enemies(p);
+        if (p->player->health > 0)
+        {
+            prog_mouse(p);
+
+            prog_player(p);
+            prog_enemies(p);
+        }
 
         SDL_RenderClear(p->rend);
 
         prog_render(p);
+
+        if (p->player->health <= 0)
+        {
+            SDL_SetRenderDrawColor(p->rend, 0, 0, 0, 100);
+            SDL_SetRenderDrawBlendMode(p->rend, SDL_BLENDMODE_BLEND);
+            SDL_RenderFillRect(p->rend, 0);
+            SDL_SetRenderDrawBlendMode(p->rend, SDL_BLENDMODE_NONE);
+        }
 
         SDL_SetRenderDrawColor(p->rend, 0, 0, 0, 255);
         SDL_RenderPresent(p->rend);
@@ -82,68 +103,99 @@ void prog_mainloop(struct Prog *p)
 
 void prog_events(struct Prog *p, SDL_Event *evt)
 {
-    struct Camera *cam = p->player->cam;
-
     while (SDL_PollEvent(evt))
     {
-        switch (evt->type)
+        prog_events_base(p, evt);
+        prog_events_game(p, evt);
+    }
+}
+
+
+void prog_events_base(struct Prog *p, SDL_Event *evt)
+{
+    switch (evt->type)
+    {
+    case SDL_QUIT:
+        p->running = false;
+        break;
+    case SDL_KEYDOWN:
+    {
+        switch (evt->key.keysym.sym)
         {
-        case SDL_QUIT:
+        case SDLK_ESCAPE:
+            p->focused = false;
+            SDL_ShowCursor(SDL_TRUE);
+            break;
+        case SDLK_q:
+            p->restart = true;
             p->running = false;
             break;
-        case SDL_KEYDOWN:
+        }
+    } break;
+    case SDL_MOUSEBUTTONDOWN:
+        p->focused = true;
+        SDL_ShowCursor(SDL_FALSE);
+        break;
+    }
+}
+
+
+void prog_events_game(struct Prog *p, SDL_Event *evt)
+{
+    switch (evt->type)
+    {
+    case SDL_KEYDOWN:
+    {
+        switch (evt->key.keysym.sym)
         {
-            switch (evt->key.keysym.sym)
-            {
-            case SDLK_ESCAPE:
-                p->focused = false;
-                SDL_ShowCursor(SDL_TRUE);
-                break;
-            case SDLK_SPACE:
-                if (p->player->vel.y == 0.f)
-                    p->player->vel.y = -.3f;
-                break;
-            case SDLK_LSHIFT:
-                p->player->cam->pos.y += 10.f;
-                break;
-            }
-        } break;
-        case SDL_MOUSEBUTTONDOWN:
-            p->focused = true;
-            SDL_ShowCursor(SDL_FALSE);
-
-            if (evt->button.button == SDL_BUTTON_LEFT)
-            {
-                struct Enemy *e;
-                bool hit = prog_player_shoot(p, &e);
-                p->player->gun->pos.y -= .1f;
-                p->player->gun->rot.y += .2f;
-
-                if (hit)
-                {
-                    --e->health;
-                    SDL_Color red = { 255, 0, 0 };
-
-                    e->body[0]->col = red;
-                    e->body[1]->col = red;
-
-                    if (e->health == 0)
-                    {
-                        e->dead = true;
-                        e->dead_time = clock();
-                    }
-                }
-            }
-
-            if (evt->button.button == SDL_BUTTON_RIGHT)
-            {
-                p->player->scoped = !p->player->scoped;
-            }
+        case SDLK_SPACE:
+            if (p->player->vel.y == 0.f)
+                p->player->vel.y = -.3f;
+            break;
+        case SDLK_LSHIFT:
+            p->player->cam->pos.y += 10.f;
             break;
         }
+    } break;
+    case SDL_MOUSEBUTTONDOWN:
+        if (evt->button.button == SDL_BUTTON_LEFT)
+        {
+            struct Enemy *e;
+            bool hit = prog_player_shoot(p, &e);
+            p->player->gun->pos.y -= .1f;
+            p->player->gun->rot.y += .2f;
+
+            if (hit)
+            {
+                --e->health;
+                SDL_Color red = { 255, 0, 0 };
+
+                e->body[0]->col = red;
+                e->body[1]->col = red;
+
+                if (e->health == 0)
+                {
+                    e->dead = true;
+                    e->dead_time = clock();
+                }
+            }
+        }
+
+        if (evt->button.button == SDL_BUTTON_RIGHT)
+        {
+            p->player->scoped = !p->player->scoped;
+        }
+        break;
     }
 
-    const Uint8* keys = SDL_GetKeyboardState(0);
+    prog_events_keystate(p);
+}
+
+
+void prog_events_keystate(struct Prog *p)
+{
+    struct Camera *cam = p->player->cam;
+    const Uint8 *keys = SDL_GetKeyboardState(0);
 
     Vec3f move = { 0.f, 0.f, 0.f };
     float speed = .2f;

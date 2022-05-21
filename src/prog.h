@@ -10,6 +10,7 @@
 struct Prog
 {
     bool running;
+    bool restart;
 
     SDL_Window *window;
     SDL_Renderer *rend;
@@ -30,6 +31,9 @@ void prog_free(struct Prog *p);
 
 void prog_mainloop(struct Prog *p);
 void prog_events(struct Prog *p, SDL_Event *evt);
+void prog_events_base(struct Prog *p, SDL_Event *evt);
+void prog_events_game(struct Prog *p, SDL_Event *evt);
+void prog_events_keystate(struct Prog *p);
 
 void prog_mouse(struct Prog *p);
 void prog_enemies(struct Prog *p);
