@@ -15,6 +15,7 @@ typedef struct
 struct Mesh
 {
     Vec3f pos;
+    Vec3f rot;
 
     Vec3f *pts;
     size_t npts;

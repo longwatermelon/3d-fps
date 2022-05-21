@@ -10,6 +10,7 @@ struct Mesh *mesh_alloc(Vec3f pos, const char *fp)
 {
     struct Mesh *m = malloc(sizeof(struct Mesh));
     m->pos = pos;
+    m->rot = (Vec3f){ 0.f, 0.f, 0.f };
 
     m->pts = 0;
     m->npts = 0;
@@ -114,7 +115,8 @@ void mesh_render(struct Mesh *m, SDL_Renderer *rend, struct Camera *c)
 
         for (int j = 0; j < 3; ++j)
         {
-            Vec3f p = vec_addv(m->pts[m->tris[i].idx[j]], m->pos);
+            Vec3f orig_p = render_rotate_cc(m->pts[m->tris[i].idx[j]], m->rot);
+            Vec3f p = vec_addv(orig_p, m->pos);
             p = vec_sub(p, c->pos);
 
             p = render_rotate_ccw(p, c->angle);
@@ -166,16 +168,16 @@ bool mesh_ray_intersect(struct Mesh *m, Vec3f ro, Vec3f rdir, float *t, Triangle
 bool mesh_ray_tri_intersect(struct Mesh *m, Triangle tri, Vec3f ro, Vec3f rdir, float *t)
 {
     // find intersection point
-    Vec3f a = m->pts[tri.idx[0]];
+    Vec3f a = render_rotate_cc(m->pts[tri.idx[0]], m->rot);
     a = vec_addv(a, m->pos);
 
-    Vec3f b = m->pts[tri.idx[1]];
+    Vec3f b = render_rotate_cc(m->pts[tri.idx[1]], m->rot);
     b = vec_addv(b, m->pos);
 
-    Vec3f c = m->pts[tri.idx[2]];
+    Vec3f c = render_rotate_cc(m->pts[tri.idx[2]], m->rot);
     c = vec_addv(c, m->pos);
 
-    Vec3f norm = m->norms[tri.nidx];
+    Vec3f norm = render_rotate_cc(m->norms[tri.nidx], m->rot);
     *t = (vec_dot(a, norm) - vec_dot(ro, norm)) / vec_dot(rdir, norm);
 
     // check if inside triangle
@@ -245,15 +247,15 @@ float mesh_point_shortest_dist_tri(struct Mesh *m, Triangle tri, Vec3f p)
 {
     float t = INFINITY;
 
-    Vec3f a = vec_addv(m->pos, m->pts[tri.idx[0]]);
-    Vec3f b = vec_addv(m->pos, m->pts[tri.idx[1]]);
-    Vec3f c = vec_addv(m->pos, m->pts[tri.idx[2]]);
+    Vec3f a = vec_addv(m->pos, render_rotate_cc(m->pts[tri.idx[0]], m->rot));
+    Vec3f b = vec_addv(m->pos, render_rotate_cc(m->pts[tri.idx[1]], m->rot));
+    Vec3f c = vec_addv(m->pos, render_rotate_cc(m->pts[tri.idx[2]], m->rot));
 
-    t = fabsf(vec_dot(vec_sub(a, p), m->norms[tri.nidx]));
+    t = fabsf(vec_dot(vec_sub(a, p), render_rotate_cc(m->norms[tri.nidx], m->rot)));
 
     Vec3f points[3] = { a, b, c };
 
-    Vec3f coefficients = util_barycentric_coefficients(points, vec_addv(p, vec_mulf(m->norms[tri.nidx], t)));
+    Vec3f coefficients = util_barycentric_coefficients(points, vec_addv(p, vec_mulf(render_rotate_cc(m->norms[tri.nidx], m->rot), t)));
 
     int negatives = 0;
     if (coefficients.x < 0.f) ++negatives;
