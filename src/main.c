@@ -1,9 +1,11 @@
 #include "prog.h"
+#include <time.h>
 #include <SDL2/SDL_video.h>
 
 
 int main(int argc, char **argv)
 {
+    srand(time(0));
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_Window *w = SDL_CreateWindow("Fps", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 800, SDL_WINDOW_SHOWN);

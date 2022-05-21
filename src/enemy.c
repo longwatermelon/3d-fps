@@ -25,6 +25,18 @@ void enemy_free(struct Enemy *e)
 
 void enemy_render(struct Enemy *e, SDL_Renderer *rend, struct Camera *c)
 {
+    for (size_t i = 0; i < 2; ++i)
+    {
+        Vec3f col = {
+            e->body[i]->col.r,
+            e->body[i]->col.g,
+            e->body[i]->col.b
+        };
+
+        col = vec_addv(col, vec_divf(vec_sub((Vec3f){ 230, 150, 245 }, col), 10.f));
+        e->body[i]->col = (SDL_Color){ col.x, col.y, col.z };
+    }
+
     e->body[0]->rot = vec_addv(e->body[0]->rot, (Vec3f){ .06f, .04f, .07f });
     e->body[1]->rot = vec_addv(e->body[1]->rot, (Vec3f){ -.09f, .08f, -.04f });
 

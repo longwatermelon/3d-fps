@@ -63,6 +63,21 @@ void prog_mainloop(struct Prog *p)
 
     while (p->running)
     {
+        for (size_t i = 0; i < p->nenemies; ++i)
+        {
+            if (p->enemies[i]->health <= 0)
+            {
+                enemy_free(p->enemies[i]);
+                memmove(p->enemies + i, p->enemies + i + 1, (--p->nenemies - i) * sizeof(struct Enemy*));
+            }
+        }
+
+        if (rand() % 500 < 1)
+        {
+            p->enemies = realloc(p->enemies, sizeof(struct Enemy*) * ++p->nenemies);
+            p->enemies[p->nenemies - 1] = enemy_alloc((Vec3f){ rand() % 40 - 20, rand() % 40 - 20, rand() % 40 - 20 });
+        }
+
         prog_events(p, &evt);
 
         SDL_Point mouse;
@@ -97,6 +112,13 @@ void prog_mainloop(struct Prog *p)
             enemy_render(p->enemies[i], p->rend, p->player->cam);
 
         player_render(p->player, p->rend);
+
+        if (p->player->scoped)
+        {
+            SDL_SetRenderDrawColor(p->rend, 255, 255, 255, 255);
+            SDL_RenderDrawLine(p->rend, 400 - 10, 400 - 10, 400 + 10, 400 + 10);
+            SDL_RenderDrawLine(p->rend, 400 + 10, 400 - 10, 400 - 10, 400 + 10);
+        }
 
         SDL_SetRenderDrawColor(p->rend, 0, 0, 0, 255);
         SDL_RenderPresent(p->rend);
@@ -145,7 +167,11 @@ void prog_events(struct Prog *p, SDL_Event *evt)
 
                 if (hit)
                 {
-                    printf("Hit\n");
+                    --e->health;
+                    SDL_Color red = { 255, 0, 0 };
+
+                    e->body[0]->col = red;
+                    e->body[1]->col = red;
                 }
             }
 
@@ -160,7 +186,7 @@ void prog_events(struct Prog *p, SDL_Event *evt)
     const Uint8* keys = SDL_GetKeyboardState(0);
 
     Vec3f move = { 0.f, 0.f, 0.f };
-    float speed = .1f;
+    float speed = .2f;
 
     if (keys[SDL_SCANCODE_W])
     {
