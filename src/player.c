@@ -21,26 +21,6 @@ void player_free(struct Player *p)
 
 void player_move(struct Player *p, Vec3f dir, struct Mesh **solids, size_t nsolids)
 {
-#if 0
-    for (size_t i = 0; i < nsolids; ++i)
-    {
-        float t;
-        Triangle tri;
-
-        if (mesh_ray_intersect(solids[i], p->cam->pos, vec_normalize(dir), &t, &tri))
-        {
-            if (t < vec_len(dir) + 1.f)
-            {
-                move = false;
-                break;
-            }
-        }
-    }
-
-    if (move)
-        p->cam->pos = vec_addv(p->cam->pos, dir);
-#endif
-
     float min = INFINITY;
     Vec3f new = vec_addv(p->cam->pos, dir);
 
@@ -54,7 +34,5 @@ void player_move(struct Player *p, Vec3f dir, struct Mesh **solids, size_t nsoli
 
     if (min > vec_len(dir) + .5f)
         p->cam->pos = new;
-
-//    printf("%f %f %f\n", p->cam->pos.x, p->cam->pos.y, p->cam->pos.z);
 }
 

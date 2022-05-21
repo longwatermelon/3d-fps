@@ -236,10 +236,6 @@ float mesh_point_shortest_dist(struct Mesh *m, Vec3f p)
             t = dist;
     }
 
-    printf("%f\n", t);
-
-//    printf("%f\n", t);
-
     return t;
 }
 
@@ -281,14 +277,5 @@ float mesh_point_shortest_dist_tri(struct Mesh *m, Triangle tri, Vec3f p)
     }
 
     return t;
-
-//    printf("%f | %f %f %f\n", t, coefficients.x, coefficients.y, coefficients.z);
-
- //   float dist;
-//    return mesh_ray_tri_intersect(m, tri, p, vec_mulf(m->norms[tri.nidx], -1.f), &dist);
-
-//    printf("%f\n", t);
-
-//    return true;
 }
 

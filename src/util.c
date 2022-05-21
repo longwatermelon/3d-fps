@@ -55,27 +55,11 @@ Vec3f util_barycentric_coefficients(Vec3f points[3], Vec3f p)
     Vec3f abp = vec_cross(ba, pa);
     float s_abp = vec_dot(n, abp);
 
-    Vec3f tmp = { 
-        s_pbc / s_abc,
-        s_apc / s_abc,
-        s_abp / s_abc
-    };
-
-    printf("%f %f %f | %f\n", tmp.x, tmp.y, tmp.z, tmp.x + tmp.y + tmp.z);
-
     return (Vec3f){
         s_pbc / s_abc,
         s_apc / s_abc,
         s_abp / s_abc
     };
-
-#if 0
-    return (Vec3f){
-        util_tri_area(x) / area,
-        util_tri_area(y) / area,
-        util_tri_area(z) / area
-    };
-#endif
 }
 
 
