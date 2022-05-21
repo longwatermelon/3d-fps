@@ -1,6 +1,7 @@
 #include "prog.h"
 #include "render.h"
 #include "mesh.h"
+#include "enemy.h"
 
 
 struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r)
@@ -47,6 +48,8 @@ void prog_mainloop(struct Prog *p)
     p->solids[0] = mesh_alloc((Vec3f){ 0.f, 5.f, 0.f }, (Vec3f){ .2f, .1f, .3f }, "res/plane.obj", solid_col);
     p->solids[1] = mesh_alloc((Vec3f){ 0.f, 0.f, 13.f }, (Vec3f){ .4f, .1f, .3f }, "res/big.obj", solid_col);
 
+    struct Enemy *e = enemy_alloc((Vec3f){ 0.f, 0.f, 5.f });
+
     while (p->running)
     {
         prog_events(p, &evt);
@@ -79,11 +82,14 @@ void prog_mainloop(struct Prog *p)
         for (size_t i = 0; i < p->nsolids; ++i)
             mesh_render(p->solids[i], p->rend, p->player->cam);
 
+        enemy_render(e, p->rend, p->player->cam);
         player_render(p->player, p->rend);
 
         SDL_SetRenderDrawColor(p->rend, 0, 0, 0, 255);
         SDL_RenderPresent(p->rend);
     }
+
+    enemy_free(e);
 }
 
 

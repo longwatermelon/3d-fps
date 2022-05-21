@@ -1,0 +1,19 @@
+#ifndef ENEMY_H
+#define ENEMY_H
+
+#include "util.h"
+#include "mesh.h"
+
+struct Enemy
+{
+    Vec3f pos;
+    struct Mesh *body[2];
+};
+
+struct Enemy *enemy_alloc(Vec3f pos);
+void enemy_free(struct Enemy *e);
+
+void enemy_render(struct Enemy *e, SDL_Renderer *rend, struct Camera *c);
+
+#endif
+
