@@ -138,6 +138,15 @@ void prog_events(struct Prog *p, SDL_Event *evt)
 
             if (evt->button.button == SDL_BUTTON_LEFT)
             {
+                struct Enemy *e;
+                bool hit = prog_player_shoot(p, &e);
+                p->player->gun->pos.y -= .1f;
+                p->player->gun->rot.y += .2f;
+
+                if (hit)
+                {
+                    printf("Hit\n");
+                }
             }
 
             if (evt->button.button == SDL_BUTTON_RIGHT)
@@ -179,5 +188,40 @@ void prog_events(struct Prog *p, SDL_Event *evt)
 
     p->player->vel.x = move.x;
     p->player->vel.z = move.z;
+}
+
+
+bool prog_player_shoot(struct Prog *p, struct Enemy **e)
+{
+    Vec3f dir = render_rotate_cc((Vec3f){ 0.f, 0.f, 1.f }, p->player->cam->angle);
+    float et = INFINITY, st = INFINITY;
+
+    for (size_t i = 0; i < p->nenemies; ++i)
+    {
+        float t;
+
+        if (enemy_ray_intersect(p->enemies[i], p->player->cam->pos, dir, &t))
+        {
+            if (t < et)
+            {
+                et = t;
+                if (e) *e = p->enemies[i];
+            }
+        }
+    }
+
+    for (size_t i = 0; i < p->nsolids; ++i)
+    {
+        float t;
+        Triangle tri;
+
+        if (mesh_ray_intersect(p->solids[i], p->player->cam->pos, dir, &t, &tri))
+        {
+            if (t < st)
+                st = t;
+        }
+    }
+
+    return et < st;
 }
 

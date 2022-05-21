@@ -32,3 +32,26 @@ void enemy_render(struct Enemy *e, SDL_Renderer *rend, struct Camera *c)
     mesh_render(e->body[1], rend, c);
 }
 
+
+bool enemy_ray_intersect(struct Enemy *e, Vec3f o, Vec3f dir, float *t)
+{
+    float min = INFINITY;
+
+    for (size_t i = 0; i < 2; ++i)
+    {
+        float tmp;
+        Triangle tri;
+
+        if (mesh_ray_intersect(e->body[i], o, dir, &tmp, &tri))
+        {
+            if (tmp < min)
+                min = tmp;
+        }
+    }
+
+    if (t)
+        *t = min;
+
+    return min != INFINITY;
+}
+

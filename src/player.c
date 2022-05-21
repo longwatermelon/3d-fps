@@ -46,8 +46,9 @@ void player_move(struct Player *p, struct Mesh **solids, size_t nsolids)
 
     p->gun->pos = vec_addv(p->cam->pos, render_rotate_cc(vec_sub(p->gun->pos, p->cam->pos), p->cam->angle));
 
-#endif
     p->gun->rot = p->cam->angle;
+
+#endif
 }
 
 
@@ -114,6 +115,8 @@ void player_animate_gun(struct Player *p)
         p->gun->pos = vec_addv(p->gun->pos, vec_divf(vec_sub(scoped, p->gun->pos), 5.f));
     else
         p->gun->pos = vec_addv(p->gun->pos, vec_divf(vec_sub(normal, p->gun->pos), 5.f));
+
+    p->gun->rot = vec_addv(p->gun->rot, vec_divf(vec_sub(p->cam->angle, p->gun->rot), 5.f));
 
 //    p->gun->pos = vec_addv(p->cam->pos, render_rotate_cc(vec_sub(p->gun->pos, p->cam->pos), p->cam->angle));
 }

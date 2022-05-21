@@ -31,5 +31,7 @@ void prog_free(struct Prog *p);
 void prog_mainloop(struct Prog *p);
 void prog_events(struct Prog *p, SDL_Event *evt);
 
+bool prog_player_shoot(struct Prog *p, struct Enemy **e);
+
 #endif
 

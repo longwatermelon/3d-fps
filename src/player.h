@@ -12,7 +12,6 @@ struct Player
 
     struct Mesh *gun;
     bool scoped;
-    bool gun_moving;
 };
 
 struct Player *player_alloc();
