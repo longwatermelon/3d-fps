@@ -35,8 +35,8 @@ void player_move(struct Player *p, struct Mesh **solids, size_t nsolids)
 
     if (p->scoped)
     {
-        x = vec_mulf(x, .5f);
-        z = vec_mulf(z, .5f);
+        x = vec_mulf(x, .25f);
+        z = vec_mulf(z, .25f);
     }
 
     if (!player_move_dir(p, x, solids, nsolids, .5f)) p->vel.x = 0.f;
