@@ -119,7 +119,7 @@ void mesh_render(struct Mesh *m, SDL_Renderer *rend, struct Camera *c)
 
             p = render_rotate_ccw(p, c->angle);
 
-            if (p.z < .5f)
+            if (p.z < .01f)
             {
                 render = false;
             }
@@ -236,6 +236,7 @@ float mesh_point_shortest_dist(struct Mesh *m, Vec3f p)
             t = dist;
     }
 
+//    printf("t = %f\n", t);
     return t;
 }
 

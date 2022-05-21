@@ -26,5 +26,7 @@ Vec3f vec_cross(Vec3f v1, Vec3f v2);
 
 bool vec_cmp(Vec3f v1, Vec3f v2);
 
+void vec_print(Vec3f v);
+
 #endif
 

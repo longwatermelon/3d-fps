@@ -1,5 +1,6 @@
 #include "vector.h"
 #include <math.h>
+#include <stdio.h>
 
 
 Vec3f vec_normalize(Vec3f v)
@@ -107,5 +108,11 @@ Vec3f vec_cross(Vec3f v1, Vec3f v2)
 bool vec_cmp(Vec3f v1, Vec3f v2)
 {
     return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z;
+}
+
+
+void vec_print(Vec3f v)
+{
+    printf("x: %f | y: %f | z: %f\n", v.x, v.y, v.z);
 }
 

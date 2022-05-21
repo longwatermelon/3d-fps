@@ -39,7 +39,7 @@ void prog_mainloop(struct Prog *p)
     SDL_Event evt;
 
     p->solids = realloc(p->solids, sizeof(struct Mesh) * ++p->nsolids);
-    p->solids[0] = mesh_alloc((Vec3f){ 0.f, 0.f, 5.f }, "res/donut.obj");
+    p->solids[0] = mesh_alloc((Vec3f){ 0.f, 0.f, 13.f }, "res/big.obj");
 
     while (p->running)
     {
@@ -93,6 +93,10 @@ void prog_events(struct Prog *p, SDL_Event *evt)
                 p->focused = false;
                 SDL_ShowCursor(SDL_TRUE);
                 break;
+            case SDLK_SPACE:
+                if (p->player->vel.y == 0.f)
+                    p->player->vel.y = -.3f;
+                break;
             }
         } break;
         case SDL_MOUSEBUTTONDOWN:
@@ -105,34 +109,38 @@ void prog_events(struct Prog *p, SDL_Event *evt)
     const Uint8* keys = SDL_GetKeyboardState(0);
 
     Vec3f move = { 0.f, 0.f, 0.f };
+    float speed = .1f;
 
     if (keys[SDL_SCANCODE_W])
     {
-        move.z += .1f * cosf(cam->angle.x);
-        move.x += .1f * sinf(cam->angle.x);
+        move.z += speed * cosf(cam->angle.x);
+        move.x += speed * sinf(cam->angle.x);
     }
 
     if (keys[SDL_SCANCODE_S])
     {
-        move.z -= .1f * cosf(cam->angle.x);
-        move.x -= .1f * sinf(cam->angle.x);
+        move.z -= speed * cosf(cam->angle.x);
+        move.x -= speed * sinf(cam->angle.x);
     }
 
     if (keys[SDL_SCANCODE_A])
     {
-        move.x += .1f * sinf(-M_PI / 2.f + cam->angle.x);
-        move.z += .1f * cosf(-M_PI / 2.f + cam->angle.x);
+        move.x += speed * sinf(-M_PI / 2.f + cam->angle.x);
+        move.z += speed * cosf(-M_PI / 2.f + cam->angle.x);
     }
 
     if (keys[SDL_SCANCODE_D])
     {
-        move.x -= .1f * sinf(-M_PI / 2.f + cam->angle.x);
-        move.z -= .1f * cosf(-M_PI / 2.f + cam->angle.x);
+        move.x -= speed * sinf(-M_PI / 2.f + cam->angle.x);
+        move.z -= speed * cosf(-M_PI / 2.f + cam->angle.x);
     }
 
-    if (keys[SDL_SCANCODE_SPACE]) move.y -= .1f;
-    if (keys[SDL_SCANCODE_LSHIFT]) move.y += .1f;
+#if 0
+    if (keys[SDL_SCANCODE_SPACE]) move.y -= speed;
+    if (keys[SDL_SCANCODE_LSHIFT]) move.y += speed;
+#endif
 
-    p->player->vel = move;
+    p->player->vel.x = move.x;
+    p->player->vel.z = move.z;
 }
 
