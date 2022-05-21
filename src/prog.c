@@ -39,7 +39,11 @@ void prog_mainloop(struct Prog *p)
     SDL_Event evt;
 
     p->solids = realloc(p->solids, sizeof(struct Mesh) * ++p->nsolids);
-    p->solids[0] = mesh_alloc((Vec3f){ 0.f, 0.f, 13.f }, "res/big.obj");
+    p->solids = realloc(p->solids, sizeof(struct Mesh) * ++p->nsolids);
+    p->solids[0] = mesh_alloc((Vec3f){ 0.f, 5.f, 0.f }, "res/plane.obj");
+    p->solids[1] = mesh_alloc((Vec3f){ 0.f, 0.f, 13.f }, "res/big.obj");
+//    p->solids[0] = mesh_alloc((Vec3f){ 0.f, 5.f, 0.f }, "res/cube.obj");
+//    p->solids[1] = mesh_alloc((Vec3f){ -2.f, 3.f, 0.f }, "res/cube.obj");
 
     while (p->running)
     {
@@ -96,6 +100,9 @@ void prog_events(struct Prog *p, SDL_Event *evt)
             case SDLK_SPACE:
                 if (p->player->vel.y == 0.f)
                     p->player->vel.y = -.3f;
+                break;
+            case SDLK_LSHIFT:
+                p->player->cam->pos.y += 10.f;
                 break;
             }
         } break;
