@@ -327,7 +327,7 @@ void prog_player(struct Prog *p)
             if (enemy_ray_intersect(p->enemies[i], p->player->knife_throw_origin, dir, &t))
             {
                 if (t <= dist)
-                    enemy_hurt(p->enemies[i], 5);
+                    enemy_hurt(p->enemies[i], 3);
             }
         }
 

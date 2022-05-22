@@ -89,8 +89,6 @@ void audio_play_sound(const char *path)
     }
     else
     {
-        Mix_Volume(g_current_channel, 32);
-
         if (Mix_PlayChannel(g_current_channel, chunk, 0) == -1)
         {
             fprintf(stderr, "Audio error: %s\n", SDL_GetError());
