@@ -7,14 +7,14 @@ OBJS=$(addprefix obj/, $(SRC:.c=.o))
 
 all:
 	mkdir -p obj/src
-	$(MAKE) fps
+	$(MAKE) rasterize
 
-fps: $(OBJS)
+rasterize: $(OBJS)
 	$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
 
 obj/src/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@ $(LIBS)
 
 clean:
-	-rm -rf obj
+	-rm -rf obj rasterize
 

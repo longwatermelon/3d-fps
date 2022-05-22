@@ -1,2 +1,3 @@
-# 3d-fps
+# rasterize
 First person shooter
+
