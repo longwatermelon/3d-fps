@@ -85,6 +85,13 @@ void prog_mainloop(struct Prog *p)
             prog_enemies(p);
         }
 
+#if HARD
+        for (size_t i = 0; i < p->nsolids; ++i)
+        {
+            p->solids[i]->rot.z += .007f;
+        }
+#endif
+
         audio_stop_finished_sounds();
 
         SDL_RenderClear(p->rend);
@@ -316,7 +323,7 @@ void prog_enemies(struct Prog *p)
 
         if (rng < 60)
             type = ENEMY_NORMAL;
-        else if (rng < 80)
+        else if (rng < 70)
             type = ENEMY_DODGE;
         else
             type = ENEMY_THROW;
