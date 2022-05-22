@@ -152,8 +152,11 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
             if (p->player->vel.y == 0.f)
                 p->player->vel.y = -.3f;
             break;
-        case SDLK_LSHIFT:
-            p->player->cam->pos.y += 10.f;
+        case SDLK_1:
+            player_switch_weapon(p->player, p->player->gun);
+            break;
+        case SDLK_2:
+            player_switch_weapon(p->player, p->player->knife);
             break;
         }
     } break;
@@ -162,8 +165,8 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
         {
             struct Enemy *e;
             bool hit = prog_player_shoot(p, &e);
-            p->player->gun->pos.y -= .1f;
-            p->player->gun->rot.y += .2f;
+            p->player->gun->mesh->pos.y -= .1f;
+            p->player->gun->mesh->rot.y += .2f;
 
             if (hit)
             {

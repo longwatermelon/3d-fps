@@ -3,15 +3,19 @@
 
 #include "vector.h"
 #include "mesh.h"
+#include "weapon.h"
 #include <time.h>
 #include <sys/types.h>
+
 
 struct Player
 {
     struct Camera *cam;
     Vec3f vel;
 
-    struct Mesh *gun;
+    struct Weapon *weapon;
+
+    struct Weapon *gun, *knife;
     bool scoped;
 
     int health;
@@ -27,9 +31,11 @@ bool player_move_dir(struct Player *p, Vec3f dir, struct Mesh **solids, size_t n
 bool player_check_dir(struct Player *p, Vec3f dir, struct Mesh **solids, size_t nsolids, float bound, float *min);
 
 void player_render(struct Player *p, SDL_Renderer *rend);
-void player_animate_gun(struct Player *p);
+void player_animate_weapon(struct Player *p);
 
 void player_hurt(struct Player *p, int damage);
+
+void player_switch_weapon(struct Player *p, struct Weapon *weapon);
 
 #endif
 
