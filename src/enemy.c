@@ -1,5 +1,6 @@
 #include "enemy.h"
 #include "audio.h"
+#include "render.h"
 
 
 struct Enemy *enemy_alloc(Vec3f pos, int type)
@@ -30,22 +31,42 @@ struct Enemy *enemy_alloc(Vec3f pos, int type)
 
         e->health = 3;
         break;
+
+    case ENEMY_THROW:
+        e->nbody = 4;
+        e->body = malloc(sizeof(struct Mesh*) * e->nbody);
+        e->default_col = (SDL_Color){ 139, 255, 110 };
+        
+        for (size_t i = 0; i < e->nbody; ++i)
+        {
+            Vec3f pos = {
+                rand() % 4 - 2,
+                rand() % 4 - 2,
+                rand() % 4 - 2
+            };
+
+            e->body[i] = mesh_alloc(vec_addv(e->pos, pos), pos, "res/monkey.obj", e->default_col);
+        }
+
+        e->health = 30;
+        break;
     }
+
+    memset(e->thrown, 0, sizeof(struct Mesh*) * 5);
 
     e->dead_time = clock();
     e->dead = false;
 
-    e->dead_animations[0] = (Vec3f){
-        (float)(rand() % 100 - 50) / 100.f,
-        (float)(rand() % 100 - 50) / 100.f,
-        (float)(rand() % 100 - 50) / 100.f
-    };
+    e->dead_animations = malloc(sizeof(Vec3f) * e->nbody);
 
-    e->dead_animations[1] = (Vec3f){
-        (float)(rand() % 100 - 50) / 100.f,
-        (float)(rand() % 100 - 50) / 100.f,
-        (float)(rand() % 100 - 50) / 100.f
-    };
+    for (size_t i = 0; i < e->nbody; ++i)
+    {
+        e->dead_animations[i] = (Vec3f){
+            (float)(rand() % 100 - 50) / 100.f,
+            (float)(rand() % 100 - 50) / 100.f,
+            (float)(rand() % 100 - 50) / 100.f
+        };
+    }
 
     return e;
 }
@@ -55,6 +76,8 @@ void enemy_free(struct Enemy *e)
 {
     for (size_t i = 0; i < e->nbody; ++i)
         mesh_free(e->body[i]);
+
+    free(e->dead_animations);
 
     free(e->body);
     free(e);
@@ -111,6 +134,13 @@ void enemy_render(struct Enemy *e, SDL_Renderer *rend, struct Camera *c)
             }
         }
     }
+    else if (e->type == ENEMY_THROW)
+    {
+        for (size_t i = 0; i < e->nbody; ++i)
+        {
+            e->body[i]->rot = vec_addv(e->body[i]->rot, (Vec3f){ .05f, .2f, .01f });
+        }
+    }
 
     for (size_t i = 0; i < e->nbody; ++i)
         mesh_render(e->body[i], rend, c);
@@ -122,7 +152,23 @@ void enemy_move(struct Enemy *e, SDL_Renderer *rend, Vec3f v)
     e->pos = vec_addv(e->pos, v);
 
     for (size_t i = 0; i < e->nbody; ++i)
-        e->body[i]->pos = vec_addv(e->body[i]->pos, v);
+    {
+        if (e->body[i] == e->thrown[i])
+        {
+            e->body[i]->pos = vec_addv(e->body[i]->pos, e->thrown_vectors[i]);
+            if (vec_len(vec_sub(e->body[i]->pos, e->pos)) > 50.f)
+            {
+                e->thrown[i] = 0;
+                e->body[i]->pos = vec_addv(e->pos, (Vec3f){
+                    rand() % 4 - 2,
+                    rand() % 4 - 2,
+                    rand() % 4 - 2
+                });
+            }
+        }
+        else
+            e->body[i]->pos = vec_addv(e->body[i]->pos, v);
+    }
 }
 
 
@@ -135,6 +181,9 @@ bool enemy_ray_intersect(struct Enemy *e, Vec3f o, Vec3f dir, float *t)
 
     for (size_t i = 0; i < e->nbody; ++i)
     {
+        if (e->thrown[i])
+            continue;
+
         float tmp;
         Triangle tri;
 
@@ -159,7 +208,10 @@ int enemy_hurt(struct Enemy *e, int damage)
     SDL_Color red = { 255, 0, 0 };
 
     for (size_t i = 0; i < e->nbody; ++i)
-        e->body[i]->col = red;
+    {
+        if (!e->thrown[i])
+            e->body[i]->col = red;
+    }
 
     if (e->health <= 0)
     {
@@ -171,6 +223,7 @@ int enemy_hurt(struct Enemy *e, int damage)
         {
         case ENEMY_NORMAL: return 1;
         case ENEMY_DODGE: return 5;
+        case ENEMY_THROW: return 20;
         }
     }
 

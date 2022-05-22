@@ -290,25 +290,51 @@ void prog_enemies(struct Prog *p)
                 }
             }
         }
+
+        if (p->enemies[i]->type == ENEMY_THROW)
+        {
+            for (size_t j = 0; j < p->enemies[i]->nbody; ++j)
+            {
+                if (p->enemies[i]->thrown[j])
+                    continue;
+
+                if (rand() % 300 < 1)
+                {
+                    p->enemies[i]->thrown[j] = p->enemies[i]->body[j];
+                    p->enemies[i]->thrown_vectors[j] = vec_divf(vec_normalize(vec_sub(p->player->cam->pos, p->enemies[i]->body[j]->pos)), 1.f);
+                }
+            }
+        }
     }
 
-    if (rand() % 300 < 1 && p->nenemies < 5)
+    if (rand() % 300 < 5 && p->nenemies < 3)
     {
         p->enemies = realloc(p->enemies, sizeof(struct Enemy*) * ++p->nenemies);
 
         int type;
         int rng = rand() % 100;
 
-        if (rng < 75)
+        if (rng < 60)
             type = ENEMY_NORMAL;
-        else
+        else if (rng < 80)
             type = ENEMY_DODGE;
+        else
+            type = ENEMY_THROW;
 
         p->enemies[p->nenemies - 1] = enemy_alloc((Vec3f){ rand() % 40 - 20, rand() % 40 - 20, rand() % 40 - 20 }, type);
     }
 
     for (size_t i = 0; i < p->nenemies; ++i)
-        enemy_move(p->enemies[i], p->rend, vec_divf(vec_normalize(vec_sub(p->player->cam->pos, p->enemies[i]->pos)), 10.f));
+    {
+        Vec3f move;
+
+        if (p->enemies[i]->type == ENEMY_THROW)
+            move = (Vec3f){ 0.f, 0.f, 0.f };
+        else
+            move = vec_divf(vec_normalize(vec_sub(p->player->cam->pos, p->enemies[i]->pos)), 10.f);
+
+        enemy_move(p->enemies[i], p->rend, move);
+    }
 }
 
 
@@ -318,10 +344,13 @@ void prog_player(struct Prog *p)
 
     for (size_t i = 0; i < p->nenemies; ++i)
     {
-        if (vec_len(vec_sub(p->player->cam->pos, p->enemies[i]->pos)) <= 2.f)
+        for (size_t j = 0; j < p->enemies[i]->nbody; ++j)
         {
-            if (!p->enemies[i]->dead)
-                player_hurt(p->player, 1);
+            if (vec_len(vec_sub(p->player->cam->pos, p->enemies[i]->body[j]->pos)) <= 2.f)
+            {
+                if (!p->enemies[i]->dead)
+                    player_hurt(p->player, 1);
+            }
         }
     }
 

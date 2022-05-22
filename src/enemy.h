@@ -5,7 +5,7 @@
 #include "mesh.h"
 #include <time.h>
 
-enum { ENEMY_NORMAL, ENEMY_DODGE };
+enum { ENEMY_NORMAL, ENEMY_DODGE, ENEMY_THROW };
 
 struct Enemy
 {
@@ -19,12 +19,15 @@ struct Enemy
     bool dead;
 
     clock_t dead_time;
-    Vec3f dead_animations[2];
+    Vec3f *dead_animations;
 
     SDL_Color default_col;
 
     float dodge_shrink;
     int dodge_shrink_sign;
+
+    struct Mesh *thrown[4];
+    Vec3f thrown_vectors[4];
 };
 
 struct Enemy *enemy_alloc(Vec3f pos, int type);
