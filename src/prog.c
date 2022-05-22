@@ -173,10 +173,10 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
             }
             else if (p->player->weapon == p->player->knife)
             {
+                p->player->knife->absolute = true;
                 p->player->knife_thrown = true;
                 p->player->knife->pos = vec_addv(p->player->cam->pos, render_rotate_cc((Vec3f){ 0.f, 0.f, 90.f }, p->player->cam->angle));
                 p->player->knife->divisor = 10.f;
-                p->player->knife->default_pos = vec_addv(p->player->cam->pos, render_rotate_cc(p->player->weapon->pos, p->player->cam->angle));
             }
         }
 

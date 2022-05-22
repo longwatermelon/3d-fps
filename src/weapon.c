@@ -9,6 +9,7 @@ struct Weapon *weapon_alloc(const char *fp, Vec3f pos, Vec3f angle, float diviso
     w->default_pos = pos;
     w->pos = pos;
     w->angle = angle;
+    w->absolute = false;
 
     w->divisor = divisor;
 
@@ -23,18 +24,18 @@ void weapon_free(struct Weapon *w)
 }
 
 
-void weapon_move(struct Weapon *w, struct Camera *c, bool absolute)
+void weapon_move(struct Weapon *w, struct Camera *c)
 {
     Vec3f pos;
 
-    if (absolute)
+    if (w->absolute)
         pos = w->pos;
     else
         pos = vec_addv(c->pos, render_rotate_cc(w->pos, c->angle));
 
     w->mesh->pos = vec_addv(w->mesh->pos, vec_divf(vec_sub(pos, w->mesh->pos), w->divisor));
 
-    if (!absolute)
+    if (!w->absolute)
         w->mesh->rot = vec_addv(w->mesh->rot, vec_divf(vec_sub(vec_addv(c->angle, w->angle), w->mesh->rot), w->divisor));
 }
 

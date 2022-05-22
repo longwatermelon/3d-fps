@@ -54,7 +54,7 @@ void player_move(struct Player *p, struct Mesh **solids, size_t nsolids)
     if (!player_move_dir(p, y, solids, nsolids, 2.f)) p->vel.y = 0.f;
     if (!player_move_dir(p, z, solids, nsolids, .5f)) p->vel.z = 0.f;
 
-    weapon_move(p->weapon, p->cam, p->knife_thrown && p->weapon == p->knife);
+    weapon_move(p->weapon, p->cam);
     player_animate_weapon(p);
 }
 
@@ -137,6 +137,7 @@ void player_animate_weapon(struct Player *p)
     {
         if (p->knife_thrown && vec_len(vec_sub(p->knife->mesh->pos, p->knife->pos)) <= 5.f)
         {
+            p->knife->absolute = false;
             p->knife_thrown = false;
             p->knife->divisor = 5.f;
             p->knife->pos = (Vec3f){ .35f, -.1f, .6f };
@@ -164,10 +165,11 @@ void player_switch_weapon(struct Player *p, struct Weapon *weapon)
 
     p->scoped = false;
     p->knife_thrown = false;
+    p->weapon->absolute = false;
 
     weapon->mesh->pos = vec_addv(p->cam->pos, render_rotate_cc((Vec3f){ .5f, -.5f, 0.f }, p->cam->angle));
     weapon->mesh->rot = vec_addv(p->cam->angle, (Vec3f){ 0.f, 1.f, 0.f });
-    p->weapon->mesh->pos = (Vec3f){ 0.f, 0.f, 0.f };
+    p->weapon->pos = p->weapon->default_pos;
     p->weapon = weapon;
 }
 
