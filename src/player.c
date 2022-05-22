@@ -10,10 +10,11 @@ struct Player *player_alloc()
     p->cam = cam_alloc((Vec3f){ 0.f, 0.f, 0.f }, (Vec3f){ 0.f, 0.f, 0.f });
     p->vel = (Vec3f){ 0.f, 0.f, 0.f };
 
-    p->gun = weapon_alloc("res/gun.obj", (Vec3f){ .35f, .5f, .8f }, (Vec3f){ 0.f, 0.f, 0.f });
+    p->gun = weapon_alloc("res/gun.obj", (Vec3f){ .35f, .5f, .8f }, (Vec3f){ 0.f, 0.f, 0.f }, 5.f);
     p->scoped = false;
 
-    p->knife = weapon_alloc("res/knife.obj", (Vec3f){ .35f, -.1f, .8f }, (Vec3f){ 0.f, 0.f, 0.f });
+    p->knife = weapon_alloc("res/knife.obj", (Vec3f){ .35f, -.1f, .8f }, (Vec3f){ 0.f, 0.f, 0.f }, 5.f);
+    p->knife_thrown = false;
 
     p->weapon = p->gun;
 
@@ -53,7 +54,7 @@ void player_move(struct Player *p, struct Mesh **solids, size_t nsolids)
     if (!player_move_dir(p, y, solids, nsolids, 2.f)) p->vel.y = 0.f;
     if (!player_move_dir(p, z, solids, nsolids, .5f)) p->vel.z = 0.f;
 
-    weapon_move(p->weapon, p->cam, 5.f);
+    weapon_move(p->weapon, p->cam);
     player_animate_weapon(p);
 }
 
@@ -122,10 +123,22 @@ void player_render(struct Player *p, SDL_Renderer *rend)
 
 void player_animate_weapon(struct Player *p)
 {
-    if (p->scoped)
-        p->gun->pos = (Vec3f){ 0.f, .4f, .6f };
-    else
-        p->gun->pos = (Vec3f){ .35f, .5f, .8f };
+    if (p->weapon == p->gun)
+    {
+        if (p->scoped)
+            p->gun->pos = (Vec3f){ 0.f, .4f, .6f };
+        else
+            p->gun->pos = (Vec3f){ .35f, .5f, .8f };
+    }
+    else if (p->weapon == p->knife)
+    {
+        if (vec_len(vec_sub(p->knife->mesh->pos, p->cam->pos)) > 35.f)
+        {
+            p->knife_thrown = false;
+            p->knife->divisor = 5.f;
+            p->knife->pos = (Vec3f){ .35f, -.1f, .8f };
+        }
+    }
 }
 
 

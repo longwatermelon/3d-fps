@@ -163,24 +163,33 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
     case SDL_MOUSEBUTTONDOWN:
         if (evt->button.button == SDL_BUTTON_LEFT)
         {
-            struct Enemy *e;
-            bool hit = prog_player_shoot(p, &e);
-            p->player->gun->mesh->pos.y -= .1f;
-            p->player->gun->mesh->rot.y += .2f;
-
-            if (hit)
+            if (p->player->weapon == p->player->gun)
             {
-                --e->health;
-                SDL_Color red = { 255, 0, 0 };
+                struct Enemy *e;
+                bool hit = prog_player_shoot(p, &e);
+                p->player->gun->mesh->pos.y -= .1f;
+                p->player->gun->mesh->rot.y += .2f;
 
-                e->body[0]->col = red;
-                e->body[1]->col = red;
-
-                if (e->health == 0)
+                if (hit)
                 {
-                    e->dead = true;
-                    e->dead_time = clock();
+                    --e->health;
+                    SDL_Color red = { 255, 0, 0 };
+
+                    e->body[0]->col = red;
+                    e->body[1]->col = red;
+
+                    if (e->health == 0)
+                    {
+                        e->dead = true;
+                        e->dead_time = clock();
+                    }
                 }
+            }
+            else if (p->player->weapon == p->player->knife)
+            {
+                p->player->knife_thrown = true;
+                p->player->knife->pos = (Vec3f){ 0.f, 0.f, 40.f };
+                p->player->knife->divisor = 10.f;
             }
         }
 
@@ -291,6 +300,27 @@ void prog_player(struct Prog *p)
         {
             if (!p->enemies[i]->dead)
                 player_hurt(p->player, 1);
+        }
+    }
+
+    if (p->player->knife_thrown)
+    {
+        struct Weapon *w = p->player->weapon;
+        Vec3f pos = vec_addv(p->player->cam->pos, render_rotate_cc(w->pos, p->player->cam->angle));
+        Vec3f new = vec_addv(w->mesh->pos, vec_divf(vec_sub(pos, w->mesh->pos), w->divisor));
+
+        float dist = vec_len(vec_sub(new, w->mesh->pos));
+
+        for (size_t i = 0; i < p->nenemies; ++i)
+        {
+            Vec3f dir = vec_normalize(render_rotate_cc(w->pos, p->player->cam->angle));
+            float t;
+
+            if (enemy_ray_intersect(p->enemies[i], p->player->knife->mesh->pos, dir, &t))
+            {
+                if (t <= dist)
+                    enemy_hurt(p->enemies[i], 5);
+            }
         }
     }
 }

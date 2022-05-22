@@ -103,3 +103,19 @@ bool enemy_ray_intersect(struct Enemy *e, Vec3f o, Vec3f dir, float *t)
     return min != INFINITY;
 }
 
+
+void enemy_hurt(struct Enemy *e, int damage)
+{
+    e->health -= damage;
+    SDL_Color red = { 255, 0, 0 };
+
+    e->body[0]->col = red;
+    e->body[1]->col = red;
+
+    if (e->health <= 0)
+    {
+        e->dead = true;
+        e->dead_time = clock();
+    }
+}
+
