@@ -35,7 +35,7 @@ void enemy_move(struct Enemy *e, SDL_Renderer *rend, Vec3f v);
 
 bool enemy_ray_intersect(struct Enemy *e, Vec3f o, Vec3f dir, float *t);
 
-void enemy_hurt(struct Enemy *e, int damage);
+int enemy_hurt(struct Enemy *e, int damage);
 
 #endif
 

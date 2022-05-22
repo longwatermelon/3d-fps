@@ -27,6 +27,8 @@ struct Prog
 
     struct Enemy **enemies;
     size_t nenemies;
+
+    int score;
 };
 
 struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r);

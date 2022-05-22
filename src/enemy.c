@@ -152,7 +152,7 @@ bool enemy_ray_intersect(struct Enemy *e, Vec3f o, Vec3f dir, float *t)
 }
 
 
-void enemy_hurt(struct Enemy *e, int damage)
+int enemy_hurt(struct Enemy *e, int damage)
 {
     audio_play_sound("res/sfx/damage.wav");
     e->health -= damage;
@@ -166,6 +166,14 @@ void enemy_hurt(struct Enemy *e, int damage)
         audio_play_sound("res/sfx/explode.wav");
         e->dead = true;
         e->dead_time = clock();
+        
+        switch (e->type)
+        {
+        case ENEMY_NORMAL: return 1;
+        case ENEMY_DODGE: return 5;
+        }
     }
+
+    return 0;
 }
 

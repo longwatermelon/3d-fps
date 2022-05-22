@@ -124,7 +124,7 @@ void player_render(struct Player *p, SDL_Renderer *rend, TTF_Font *font)
         SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_NONE);
     }
 
-    char *s = calloc(sizeof(char), strlen("Health: ") + 12);
+    char s[100] = { 0 };
     sprintf(s, "Health: %d", p->health);
 
     SDL_Texture *tex = render_text(rend, font, s);
@@ -132,7 +132,6 @@ void player_render(struct Player *p, SDL_Renderer *rend, TTF_Font *font)
     SDL_QueryTexture(tex, 0, 0, &r.w, &r.h);
     SDL_RenderCopy(rend, tex, 0, &r);
 
-    free(s);
     SDL_DestroyTexture(tex);
 }
 

@@ -28,6 +28,8 @@ struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r)
     p->enemies = 0;
     p->nenemies = 0;
 
+    p->score = 0;
+
     return p;
 }
 
@@ -175,9 +177,7 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
                 audio_play_sound("res/sfx/gunshot.wav");
 
                 if (hit)
-                {
-                    enemy_hurt(e, 1);
-                }
+                    p->score += enemy_hurt(e, 1);
             }
             else if (p->player->weapon == p->player->knife)
             {
@@ -352,7 +352,7 @@ void prog_player(struct Prog *p)
             if (enemy_ray_intersect(p->enemies[i], p->player->knife_throw_origin, dir, &t))
             {
                 if (t <= dist)
-                    enemy_hurt(p->enemies[i], 5);
+                    p->score += enemy_hurt(p->enemies[i], 5);
             }
         }
 
@@ -377,6 +377,16 @@ void prog_render(struct Prog *p)
         SDL_RenderDrawLine(p->rend, 400 - 10, 400 - 10, 400 + 10, 400 + 10);
         SDL_RenderDrawLine(p->rend, 400 + 10, 400 - 10, 400 - 10, 400 + 10);
     }
+
+    char score[100] = { 0 };
+    sprintf(score, "Score: %d", p->score);
+
+    SDL_Texture *tex = render_text(p->rend, p->font, score);
+    SDL_Rect r = { 20, 60 };
+    SDL_QueryTexture(tex, 0, 0, &r.w, &r.h);
+
+    SDL_RenderCopy(p->rend, tex, 0, &r);
+    SDL_DestroyTexture(tex);
 }
 
 
