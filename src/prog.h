@@ -5,6 +5,7 @@
 #include "mesh.h"
 #include "enemy.h"
 #include <stdbool.h>
+#include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL.h>
 
 struct Prog
@@ -14,6 +15,8 @@ struct Prog
 
     SDL_Window *window;
     SDL_Renderer *rend;
+
+    TTF_Font *font;
 
     bool focused;
 

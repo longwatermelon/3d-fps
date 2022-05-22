@@ -110,7 +110,7 @@ bool player_check_dir(struct Player *p, Vec3f dir, struct Mesh **solids, size_t 
 }
 
 
-void player_render(struct Player *p, SDL_Renderer *rend)
+void player_render(struct Player *p, SDL_Renderer *rend, TTF_Font *font)
 {
     weapon_render(p->weapon, rend, p->cam);
 
@@ -121,6 +121,17 @@ void player_render(struct Player *p, SDL_Renderer *rend)
         SDL_RenderFillRect(rend, 0);
         SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_NONE);
     }
+
+    char *s = calloc(sizeof(char), strlen("Health: ") + 12);
+    sprintf(s, "Health: %d", p->health);
+
+    SDL_Texture *tex = render_text(rend, font, s);
+    SDL_Rect r = { 20, 30 };
+    SDL_QueryTexture(tex, 0, 0, &r.w, &r.h);
+    SDL_RenderCopy(rend, tex, 0, &r);
+
+    free(s);
+    SDL_DestroyTexture(tex);
 }
 
 

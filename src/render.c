@@ -69,3 +69,16 @@ Vec3f render_rotate_cc(Vec3f p, Vec3f angle)
     return util_matmul(roty, util_matmul(rotx, util_matmul(rotz, p)));
 }
 
+
+SDL_Texture *render_text(SDL_Renderer *rend, TTF_Font *font, const char *s)
+{
+    if (strlen(s) == 0)
+        return 0;
+
+    SDL_Surface *surf = TTF_RenderText_Blended(font, s, (SDL_Color){ 255, 255, 255 });
+    SDL_Texture *tex = SDL_CreateTextureFromSurface(rend, surf);
+
+    SDL_FreeSurface(surf);
+    return tex;
+}
+

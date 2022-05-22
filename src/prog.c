@@ -13,6 +13,8 @@ struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r)
     p->window = w;
     p->rend = r;
 
+    p->font = TTF_OpenFont("res/font.ttf", 16);
+
     SDL_WarpMouseInWindow(p->window, 400, 400);
     SDL_ShowCursor(SDL_FALSE);
     p->focused = true;
@@ -31,6 +33,8 @@ struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r)
 
 void prog_free(struct Prog *p)
 {
+    TTF_CloseFont(p->font);
+
     player_free(p->player);
 
     for (size_t i = 0; i < p->nsolids; ++i)
@@ -59,9 +63,6 @@ void prog_mainloop(struct Prog *p)
     p->solids[0] = mesh_alloc((Vec3f){ 0.f, 5.f, 0.f }, (Vec3f){ .2f, .1f, .3f }, "res/plane.obj", solid_col);
     p->solids[0]->bculling = false;
     p->solids[1] = mesh_alloc((Vec3f){ 0.f, 0.f, 13.f }, (Vec3f){ .4f, .1f, .3f }, "res/big.obj", solid_col);
-
-    p->enemies = malloc(sizeof(struct Enemy*) * ++p->nenemies);
-    p->enemies[0] = enemy_alloc((Vec3f){ 0.f, 5.f, 0.f });
 
     while (p->running)
     {
@@ -318,7 +319,7 @@ void prog_render(struct Prog *p)
     for (size_t i = 0; i < p->nenemies; ++i)
         enemy_render(p->enemies[i], p->rend, p->player->cam);
 
-    player_render(p->player, p->rend);
+    player_render(p->player, p->rend, p->font);
 
     if (p->player->scoped)
     {
