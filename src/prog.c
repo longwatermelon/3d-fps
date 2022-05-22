@@ -2,6 +2,7 @@
 #include "render.h"
 #include "mesh.h"
 #include "enemy.h"
+#include "audio.h"
 
 
 struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r)
@@ -81,6 +82,8 @@ void prog_mainloop(struct Prog *p)
             prog_player(p);
             prog_enemies(p);
         }
+
+        audio_stop_finished_sounds();
 
         SDL_RenderClear(p->rend);
 
@@ -169,11 +172,16 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
                 p->player->gun->mesh->pos.y -= .1f;
                 p->player->gun->mesh->rot.y += .2f;
 
+                audio_play_sound("res/sfx/gunshot.wav");
+
                 if (hit)
+                {
                     enemy_hurt(e, 1);
+                }
             }
             else if (p->player->weapon == p->player->knife)
             {
+                audio_play_sound("res/sfx/slash.wav");
                 p->player->knife->absolute = true;
                 p->player->knife_thrown = true;
                 p->player->knife->pos = vec_addv(p->player->cam->pos, render_rotate_cc((Vec3f){ 0.f, 0.f, 90.f }, p->player->cam->angle));
@@ -184,6 +192,9 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
         if (evt->button.button == SDL_BUTTON_RIGHT)
         {
             p->player->scoped = !p->player->scoped;
+
+            if (p->player->weapon == p->player->gun)
+                audio_play_sound("res/sfx/gun_scope.wav");
         }
         break;
     }

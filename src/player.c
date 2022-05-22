@@ -1,6 +1,7 @@
 #include "player.h"
 #include "camera.h"
 #include "render.h"
+#include "audio.h"
 #include <stdlib.h>
 
 
@@ -162,6 +163,7 @@ void player_hurt(struct Player *p, int damage)
 {
     if ((clock() - p->last_hurt) / CLOCKS_PER_SEC > 1)
     {
+        audio_play_sound("res/sfx/player_damage.wav");
         p->health -= damage;
         p->last_hurt = clock();
     }
@@ -181,5 +183,8 @@ void player_switch_weapon(struct Player *p, struct Weapon *weapon)
     weapon->mesh->rot = vec_addv(p->cam->angle, (Vec3f){ 0.f, 1.f, 0.f });
     p->weapon->pos = p->weapon->default_pos;
     p->weapon = weapon;
+
+    if (weapon == p->gun) audio_play_sound("res/sfx/gun_cock.wav");
+    if (weapon == p->knife) audio_play_sound("res/sfx/knife_equip.wav");
 }
 

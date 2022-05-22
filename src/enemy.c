@@ -1,4 +1,5 @@
 #include "enemy.h"
+#include "audio.h"
 
 
 struct Enemy *enemy_alloc(Vec3f pos)
@@ -106,6 +107,7 @@ bool enemy_ray_intersect(struct Enemy *e, Vec3f o, Vec3f dir, float *t)
 
 void enemy_hurt(struct Enemy *e, int damage)
 {
+    audio_play_sound("res/sfx/damage.wav");
     e->health -= damage;
     SDL_Color red = { 255, 0, 0 };
 
@@ -114,6 +116,7 @@ void enemy_hurt(struct Enemy *e, int damage)
 
     if (e->health <= 0)
     {
+        audio_play_sound("res/sfx/explode.wav");
         e->dead = true;
         e->dead_time = clock();
     }
