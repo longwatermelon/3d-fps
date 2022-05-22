@@ -178,7 +178,7 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
             else if (p->player->weapon == p->player->knife)
             {
                 p->player->knife_thrown = true;
-                p->player->knife->pos = (Vec3f){ 0.f, 0.f, 40.f };
+                p->player->knife->pos = (Vec3f){ 0.f, 0.f, 90.f };
                 p->player->knife->divisor = 10.f;
             }
         }

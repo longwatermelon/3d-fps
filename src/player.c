@@ -132,11 +132,12 @@ void player_animate_weapon(struct Player *p)
     }
     else if (p->weapon == p->knife)
     {
-        if (vec_len(vec_sub(p->knife->mesh->pos, p->cam->pos)) > 35.f)
+        if (vec_len(vec_sub(p->knife->mesh->pos, p->cam->pos)) >= 80.f)
         {
             p->knife_thrown = false;
             p->knife->divisor = 5.f;
             p->knife->pos = (Vec3f){ .35f, -.1f, .6f };
+            p->knife->mesh->pos = vec_sub(vec_addv(p->cam->pos, render_rotate_cc((Vec3f){ .35f, -.1f, .6f }, p->cam->angle)), vec_mulf(render_rotate_cc((Vec3f){ 0.f, 0.f, 1.f }, p->cam->angle), 2.f));
         }
     }
 }
