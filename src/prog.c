@@ -296,17 +296,10 @@ void prog_player(struct Prog *p)
     if (p->player->knife_thrown)
     {
         struct Weapon *w = p->player->weapon;
-#if 0
-    Vec3f pos = vec_addv(c->pos, render_rotate_cc(w->pos, c->angle));
-    w->mesh->pos = vec_addv(w->mesh->pos, vec_divf(vec_sub(pos, w->mesh->pos), w->divisor));
-#endif
-
-
         Vec3f pos = vec_addv(p->player->cam->pos, render_rotate_cc(w->pos, p->player->cam->angle));
         Vec3f new = vec_addv(w->mesh->pos, vec_divf(vec_sub(pos, w->mesh->pos), w->divisor));
 
         float dist = vec_len(vec_sub(new, w->mesh->pos));
-//        printf("%f\n", dist);
 
         for (size_t i = 0; i < p->nenemies; ++i)
         {
