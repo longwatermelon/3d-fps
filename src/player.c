@@ -16,6 +16,7 @@ struct Player *player_alloc()
 
     p->knife = weapon_alloc("res/knife.obj", (Vec3f){ .35f, -.1f, .6f }, (Vec3f){ 0.f, 0.f, 0.f }, 5.f);
     p->knife_thrown = false;
+    p->knife_throw_origin = (Vec3f){ 0.f, 0.f, 0.f };
 
     p->weapon = p->gun;
 

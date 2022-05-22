@@ -17,7 +17,9 @@ struct Player
 
     struct Weapon *gun, *knife;
     bool scoped;
+
     bool knife_thrown;
+    Vec3f knife_throw_origin;
 
     int health;
 

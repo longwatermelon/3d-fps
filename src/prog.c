@@ -186,6 +186,7 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
                 p->player->knife_thrown = true;
                 p->player->knife->pos = vec_addv(p->player->cam->pos, render_rotate_cc((Vec3f){ 0.f, 0.f, 90.f }, p->player->cam->angle));
                 p->player->knife->divisor = 10.f;
+                p->player->knife_throw_origin = p->player->cam->pos;
             }
         }
 
@@ -305,19 +306,32 @@ void prog_player(struct Prog *p)
     if (p->player->knife_thrown)
     {
         struct Weapon *w = p->player->weapon;
-        float dist = vec_len(vec_divf(vec_sub(w->pos, w->mesh->pos), w->divisor));
-        Vec3f dir = vec_normalize(vec_sub(w->pos, w->mesh->pos));
+        float x = vec_len(vec_sub(w->pos, p->player->knife_throw_origin));
+        float y = vec_len(vec_sub(w->pos, vec_addv(p->player->cam->pos, render_rotate_cc(w->default_pos, p->player->cam->angle))));
+        float y1 = vec_len(vec_sub(w->pos, w->mesh->pos));
+
+        float x1 = (x * y1) / y;
+        float dist = x1;
+
+        y1 = vec_len(vec_sub(vec_sub(w->pos, w->mesh->pos), vec_divf(vec_sub(w->pos, w->mesh->pos), w->divisor)));
+        x1 = (x * y1) / y;
+
+        dist -= x1;
+
+        Vec3f dir = vec_normalize(vec_sub(w->pos, p->player->knife_throw_origin));
 
         for (size_t i = 0; i < p->nenemies; ++i)
         {
             float t;
 
-            if (enemy_ray_intersect(p->enemies[i], w->mesh->pos, dir, &t))
+            if (enemy_ray_intersect(p->enemies[i], p->player->knife_throw_origin, dir, &t))
             {
                 if (t <= dist)
                     enemy_hurt(p->enemies[i], 5);
             }
         }
+
+        p->player->knife_throw_origin = vec_addv(p->player->knife_throw_origin, vec_mulf(dir, dist));
     }
 }
 
