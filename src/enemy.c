@@ -2,15 +2,36 @@
 #include "audio.h"
 
 
-struct Enemy *enemy_alloc(Vec3f pos)
+struct Enemy *enemy_alloc(Vec3f pos, int type)
 {
     struct Enemy *e = malloc(sizeof(struct Enemy));
+    e->type = type;
     e->pos = pos;
 
-    e->body[0] = mesh_alloc(e->pos, (Vec3f){ 1.f, 1.f, .8f }, "res/donut.obj", (SDL_Color){ 230, 150, 245 });
-    e->body[1] = mesh_alloc(e->pos, (Vec3f){ .6f, 1.6f, 1.f }, "res/donut.obj", (SDL_Color){ 230, 150, 245 });
+    e->dodge_shrink = 0.f;
+    e->dodge_shrink_sign = 1;
 
-    e->health = 5;
+    switch (type)
+    {
+    case ENEMY_NORMAL:
+        e->nbody = 2;
+        e->body = malloc(sizeof(struct Mesh*) * e->nbody);
+        e->default_col = (SDL_Color){ 230, 150, 245 };
+        e->body[0] = mesh_alloc(e->pos, (Vec3f){ 1.f, 1.f, .8f }, "res/donut.obj", e->default_col);
+        e->body[1] = mesh_alloc(e->pos, (Vec3f){ .6f, 1.6f, 1.f }, "res/donut.obj", e->default_col);
+
+        e->health = 5;
+        break;
+    case ENEMY_DODGE:
+        e->nbody = 1;
+        e->body = malloc(sizeof(struct Mesh*) * e->nbody);
+        e->default_col = (SDL_Color){ 255, 255, 110 };
+        e->body[0] = mesh_alloc(e->pos, (Vec3f){ 0.f, 0.f, 0.f }, "res/donut.obj", e->default_col);
+
+        e->health = 3;
+        break;
+    }
+
     e->dead_time = clock();
     e->dead = false;
 
@@ -32,15 +53,17 @@ struct Enemy *enemy_alloc(Vec3f pos)
 
 void enemy_free(struct Enemy *e)
 {
-    mesh_free(e->body[0]);
-    mesh_free(e->body[1]);
+    for (size_t i = 0; i < e->nbody; ++i)
+        mesh_free(e->body[i]);
+
+    free(e->body);
     free(e);
 }
 
 
 void enemy_render(struct Enemy *e, SDL_Renderer *rend, struct Camera *c)
 {
-    for (size_t i = 0; i < 2; ++i)
+    for (size_t i = 0; i < e->nbody; ++i)
     {
         Vec3f col = {
             e->body[i]->col.r,
@@ -56,17 +79,41 @@ void enemy_render(struct Enemy *e, SDL_Renderer *rend, struct Camera *c)
         }
         else
         {
-            col = vec_addv(col, vec_divf(vec_sub((Vec3f){ 230, 150, 245 }, col), 10.f));
+            Vec3f def = { e->default_col.r, e->default_col.g, e->default_col.b };
+            col = vec_addv(col, vec_divf(vec_sub(def, col), 10.f));
         }
 
         e->body[i]->col = (SDL_Color){ col.x, col.y, col.z };
     }
 
-    e->body[0]->rot = vec_addv(e->body[0]->rot, (Vec3f){ .06f, .04f, .07f });
-    e->body[1]->rot = vec_addv(e->body[1]->rot, (Vec3f){ -.09f, .08f, -.04f });
+    if (e->type == ENEMY_NORMAL)
+    {
+        e->body[0]->rot = vec_addv(e->body[0]->rot, (Vec3f){ .06f, .04f, .07f });
+        e->body[1]->rot = vec_addv(e->body[1]->rot, (Vec3f){ -.09f, .08f, -.04f });
+    }
+    else if (e->type == ENEMY_DODGE)
+    {
+        if (e->dodge_shrink >= .5f)
+            e->dodge_shrink_sign = -1;
+        if (e->dodge_shrink <= -.5f)
+            e->dodge_shrink_sign = 1;
 
-    mesh_render(e->body[0], rend, c);
-    mesh_render(e->body[1], rend, c);
+        e->dodge_shrink += e->dodge_shrink_sign * .01f;
+
+        for (size_t i = 0; i < e->nbody; ++i)
+        {
+            e->body[i]->rot = vec_addv(e->body[i]->rot, (Vec3f){ .05f, -.1f, .02f });
+
+            for (size_t j = 0; j < e->body[i]->npts; ++j)
+            {
+                Vec3f p = e->body[i]->pts[j];
+                e->body[i]->pts[j] = vec_addv(p, vec_mulf(vec_sub(e->body[i]->pos, p), e->dodge_shrink / 100.f));
+            }
+        }
+    }
+
+    for (size_t i = 0; i < e->nbody; ++i)
+        mesh_render(e->body[i], rend, c);
 }
 
 
@@ -74,8 +121,8 @@ void enemy_move(struct Enemy *e, SDL_Renderer *rend, Vec3f v)
 {
     e->pos = vec_addv(e->pos, v);
 
-    e->body[0]->pos = vec_addv(e->body[0]->pos, v);
-    e->body[1]->pos = vec_addv(e->body[1]->pos, v);
+    for (size_t i = 0; i < e->nbody; ++i)
+        e->body[i]->pos = vec_addv(e->body[i]->pos, v);
 }
 
 
@@ -86,7 +133,7 @@ bool enemy_ray_intersect(struct Enemy *e, Vec3f o, Vec3f dir, float *t)
 
     float min = INFINITY;
 
-    for (size_t i = 0; i < 2; ++i)
+    for (size_t i = 0; i < e->nbody; ++i)
     {
         float tmp;
         Triangle tri;
@@ -111,8 +158,8 @@ void enemy_hurt(struct Enemy *e, int damage)
     e->health -= damage;
     SDL_Color red = { 255, 0, 0 };
 
-    e->body[0]->col = red;
-    e->body[1]->col = red;
+    for (size_t i = 0; i < e->nbody; ++i)
+        e->body[i]->col = red;
 
     if (e->health <= 0)
     {

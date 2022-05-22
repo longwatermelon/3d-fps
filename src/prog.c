@@ -275,18 +275,40 @@ void prog_enemies(struct Prog *p)
             enemy_free(p->enemies[i]);
             memmove(p->enemies + i, p->enemies + i + 1, (--p->nenemies - i) * sizeof(struct Enemy*));
         }
+
+        if (p->enemies[i]->type == ENEMY_DODGE)
+        {
+            float t;
+            Vec3f pdir = render_rotate_cc((Vec3f){ 0.f, 0.f, 1.f }, p->player->cam->angle);
+
+            if (p->player->knife_thrown && enemy_ray_intersect(p->enemies[i], p->player->cam->pos, pdir, &t))
+            {
+                if (vec_dot(vec_sub(p->enemies[i]->body[0]->pos, p->player->cam->pos), pdir) >= 0.f)
+                {
+                    Vec3f dst = vec_addv(p->player->cam->pos, vec_mulf(pdir, -10.f));
+                    enemy_move(p->enemies[i], p->rend, vec_sub(dst, p->enemies[i]->pos));
+                }
+            }
+        }
     }
 
-    if (rand() % 300 < 1)
+    if (rand() % 300 < 1 && p->nenemies < 5)
     {
         p->enemies = realloc(p->enemies, sizeof(struct Enemy*) * ++p->nenemies);
-        p->enemies[p->nenemies - 1] = enemy_alloc((Vec3f){ rand() % 40 - 20, rand() % 40 - 20, rand() % 40 - 20 });
+
+        int type;
+        int rng = rand() % 100;
+
+        if (rng < 75)
+            type = ENEMY_NORMAL;
+        else
+            type = ENEMY_DODGE;
+
+        p->enemies[p->nenemies - 1] = enemy_alloc((Vec3f){ rand() % 40 - 20, rand() % 40 - 20, rand() % 40 - 20 }, type);
     }
 
     for (size_t i = 0; i < p->nenemies; ++i)
-    {
         enemy_move(p->enemies[i], p->rend, vec_divf(vec_normalize(vec_sub(p->player->cam->pos, p->enemies[i]->pos)), 10.f));
-    }
 }
 
 
@@ -322,12 +344,15 @@ void prog_player(struct Prog *p)
 
         for (size_t i = 0; i < p->nenemies; ++i)
         {
+            if (p->enemies[i]->type == ENEMY_DODGE)
+                continue;
+
             float t;
 
             if (enemy_ray_intersect(p->enemies[i], p->player->knife_throw_origin, dir, &t))
             {
                 if (t <= dist)
-                    enemy_hurt(p->enemies[i], 3);
+                    enemy_hurt(p->enemies[i], 5);
             }
         }
 
