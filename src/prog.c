@@ -57,7 +57,7 @@ void prog_mainloop(struct Prog *p)
     p->nenemies = 1;
     p->enemies = malloc(sizeof(struct Enemy*) * p->nenemies);
 
-    SDL_Color solid_col = { 200, 200, 200 };
+    SDL_Color solid_col = { 170, 170, 170 };
 
     p->solids[0] = mesh_alloc((Vec3f){ 0.f, 5.f, 0.f }, (Vec3f){ .2f, .1f, .3f }, "res/plane.obj", solid_col);
     p->solids[0]->bculling = false;
