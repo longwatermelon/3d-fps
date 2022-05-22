@@ -13,7 +13,7 @@ struct Player *player_alloc()
     p->gun = weapon_alloc("res/gun.obj", (Vec3f){ .35f, .5f, .8f }, (Vec3f){ 0.f, 0.f, 0.f }, 5.f);
     p->scoped = false;
 
-    p->knife = weapon_alloc("res/knife.obj", (Vec3f){ .35f, -.1f, .8f }, (Vec3f){ 0.f, 0.f, 0.f }, 5.f);
+    p->knife = weapon_alloc("res/knife.obj", (Vec3f){ .35f, -.1f, .6f }, (Vec3f){ 0.f, 0.f, 0.f }, 5.f);
     p->knife_thrown = false;
 
     p->weapon = p->gun;
@@ -136,7 +136,7 @@ void player_animate_weapon(struct Player *p)
         {
             p->knife_thrown = false;
             p->knife->divisor = 5.f;
-            p->knife->pos = (Vec3f){ .35f, -.1f, .8f };
+            p->knife->pos = (Vec3f){ .35f, -.1f, .6f };
         }
     }
 }
@@ -154,6 +154,9 @@ void player_hurt(struct Player *p, int damage)
 
 void player_switch_weapon(struct Player *p, struct Weapon *weapon)
 {
+    if (p->weapon == weapon)
+        return;
+
     weapon->mesh->pos = vec_addv(p->cam->pos, render_rotate_cc((Vec3f){ .5f, -.5f, 0.f }, p->cam->angle));
     weapon->mesh->rot = vec_addv(p->cam->angle, (Vec3f){ 0.f, 1.f, 0.f });
     p->weapon->mesh->pos = (Vec3f){ 0.f, 0.f, 0.f };

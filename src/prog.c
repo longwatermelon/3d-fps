@@ -153,10 +153,12 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
                 p->player->vel.y = -.3f;
             break;
         case SDLK_1:
-            player_switch_weapon(p->player, p->player->gun);
+            if (!p->player->scoped)
+                player_switch_weapon(p->player, p->player->gun);
             break;
         case SDLK_2:
-            player_switch_weapon(p->player, p->player->knife);
+            if (!p->player->scoped)
+                player_switch_weapon(p->player, p->player->knife);
             break;
         }
     } break;
