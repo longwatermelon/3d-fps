@@ -171,19 +171,7 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
                 p->player->gun->mesh->rot.y += .2f;
 
                 if (hit)
-                {
-                    --e->health;
-                    SDL_Color red = { 255, 0, 0 };
-
-                    e->body[0]->col = red;
-                    e->body[1]->col = red;
-
-                    if (e->health == 0)
-                    {
-                        e->dead = true;
-                        e->dead_time = clock();
-                    }
-                }
+                    enemy_hurt(e, 1);
             }
             else if (p->player->weapon == p->player->knife)
             {
