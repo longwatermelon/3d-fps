@@ -5,7 +5,8 @@
 struct Weapon *weapon_alloc(const char *fp, Vec3f pos, Vec3f angle, float divisor)
 {
     struct Weapon *w = malloc(sizeof(struct Weapon));
-    w->mesh = mesh_alloc((Vec3f){ 0.f, 0.f, 0.f }, (Vec3f){ 0.f, 0.f, 0.f }, fp, (SDL_Color){ 255, 255, 255 });
+    w->mesh = mesh_alloc((Vec3f){ 0.f, 0.f, 0.f }, (Vec3f){ 0.f, 0.f, 0.f }, fp, (SDL_Color){ 112, 181, 255 });
+    w->default_pos = pos;
     w->pos = pos;
     w->angle = angle;
 

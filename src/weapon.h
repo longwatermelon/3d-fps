@@ -8,6 +8,7 @@ struct Weapon
 {
     struct Mesh *mesh;
     Vec3f pos, angle;
+    Vec3f default_pos;
     float divisor;
 };
 
