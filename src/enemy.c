@@ -116,9 +116,9 @@ void enemy_render(struct Enemy *e, SDL_Renderer *rend, struct Camera *c)
     }
     else if (e->type == ENEMY_DODGE)
     {
-        if (e->dodge_shrink >= .5f)
+        if (e->dodge_shrink >= .35f)
             e->dodge_shrink_sign = -1;
-        if (e->dodge_shrink <= -.5f)
+        if (e->dodge_shrink <= -.35f)
             e->dodge_shrink_sign = 1;
 
         e->dodge_shrink += e->dodge_shrink_sign * .01f;

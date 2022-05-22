@@ -36,6 +36,8 @@ struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r)
 
 void prog_free(struct Prog *p)
 {
+    audio_stop_music();
+
     TTF_CloseFont(p->font);
 
     player_free(p->player);
@@ -56,6 +58,7 @@ void prog_free(struct Prog *p)
 
 void prog_mainloop(struct Prog *p)
 {
+    audio_play_music("res/sfx/wind.wav");
     SDL_Event evt;
 
     p->nsolids = 2;
@@ -69,6 +72,8 @@ void prog_mainloop(struct Prog *p)
 
     while (p->running)
     {
+        int prev_score = p->score;
+
         if (p->player->health > 0)
             prog_events(p, &evt);
         else
@@ -85,12 +90,11 @@ void prog_mainloop(struct Prog *p)
             prog_enemies(p);
         }
 
-#if HARD
         for (size_t i = 0; i < p->nsolids; ++i)
         {
-            p->solids[i]->rot.z += .007f;
+            if (p->score >= 30)
+                p->solids[i]->rot.z += .007f;
         }
-#endif
 
         audio_stop_finished_sounds();
 
@@ -108,6 +112,12 @@ void prog_mainloop(struct Prog *p)
 
         SDL_SetRenderDrawColor(p->rend, 0, 0, 0, 255);
         SDL_RenderPresent(p->rend);
+
+        if (p->score != prev_score && prev_score < 30 && p->score >= 30)
+        {
+            audio_play_music("res/sfx/roll.wav");
+            audio_play_sound("res/sfx/rotate.wav");
+        }
     }
 }
 
