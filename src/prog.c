@@ -54,16 +54,11 @@ void prog_mainloop(struct Prog *p)
     p->nsolids = 2;
     p->solids = malloc(sizeof(struct Mesh*) * p->nsolids);
 
-    p->nenemies = 1;
-    p->enemies = malloc(sizeof(struct Enemy*) * p->nenemies);
-
     SDL_Color solid_col = { 170, 170, 170 };
 
     p->solids[0] = mesh_alloc((Vec3f){ 0.f, 5.f, 0.f }, (Vec3f){ .2f, .1f, .3f }, "res/plane.obj", solid_col);
     p->solids[0]->bculling = false;
     p->solids[1] = mesh_alloc((Vec3f){ 0.f, 0.f, 13.f }, (Vec3f){ .4f, .1f, .3f }, "res/big.obj", solid_col);
-
-    p->enemies[0] = enemy_alloc((Vec3f){ 0.f, 0.f, 5.f });
 
     while (p->running)
     {
@@ -153,12 +148,10 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
                 p->player->vel.y = -.3f;
             break;
         case SDLK_1:
-            if (!p->player->scoped)
-                player_switch_weapon(p->player, p->player->gun);
+            player_switch_weapon(p->player, p->player->gun);
             break;
         case SDLK_2:
-            if (!p->player->scoped)
-                player_switch_weapon(p->player, p->player->knife);
+            player_switch_weapon(p->player, p->player->knife);
             break;
         }
     } break;

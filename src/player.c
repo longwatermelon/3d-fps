@@ -158,6 +158,8 @@ void player_switch_weapon(struct Player *p, struct Weapon *weapon)
     if (p->weapon == weapon)
         return;
 
+    p->scoped = false;
+
     weapon->mesh->pos = vec_addv(p->cam->pos, render_rotate_cc((Vec3f){ .5f, -.5f, 0.f }, p->cam->angle));
     weapon->mesh->rot = vec_addv(p->cam->angle, (Vec3f){ 0.f, 1.f, 0.f });
     p->weapon->mesh->pos = (Vec3f){ 0.f, 0.f, 0.f };
