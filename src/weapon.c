@@ -26,13 +26,7 @@ void weapon_free(struct Weapon *w)
 
 void weapon_move(struct Weapon *w, struct Camera *c)
 {
-    Vec3f pos;
-
-    if (w->absolute)
-        pos = w->pos;
-    else
-        pos = vec_addv(c->pos, render_rotate_cc(w->pos, c->angle));
-
+    Vec3f pos = weapon_coords(w, w->pos, c);
     w->mesh->pos = vec_addv(w->mesh->pos, vec_divf(vec_sub(pos, w->mesh->pos), w->divisor));
 
     if (!w->absolute)
@@ -43,5 +37,14 @@ void weapon_move(struct Weapon *w, struct Camera *c)
 void weapon_render(struct Weapon *w, SDL_Renderer *rend, struct Camera *c)
 {
     mesh_render(w->mesh, rend, c);
+}
+
+
+Vec3f weapon_coords(struct Weapon *w, Vec3f c, struct Camera *cam)
+{
+    if (w->absolute)
+        return c;
+    else
+        return vec_addv(cam->pos, render_rotate_cc(c, cam->angle));
 }
 

@@ -140,9 +140,8 @@ void player_animate_weapon(struct Player *p)
             p->knife->absolute = false;
             p->knife_thrown = false;
             p->knife->divisor = 5.f;
-            p->knife->pos = (Vec3f){ .35f, -.1f, .6f };
-            p->knife->default_pos = (Vec3f){ .35f, -.1f, .6f };
-            p->knife->mesh->pos = vec_sub(vec_addv(p->cam->pos, render_rotate_cc((Vec3f){ .35f, -.1f, .6f }, p->cam->angle)), vec_mulf(render_rotate_cc((Vec3f){ 0.f, 0.f, 1.f }, p->cam->angle), 2.f));
+            p->knife->pos = p->knife->default_pos;
+            p->knife->mesh->pos = vec_sub(vec_addv(p->cam->pos, render_rotate_cc(p->knife->pos, p->cam->angle)), vec_mulf(render_rotate_cc((Vec3f){ 0.f, 0.f, 1.f }, p->cam->angle), 2.f));
         }
     }
 }
