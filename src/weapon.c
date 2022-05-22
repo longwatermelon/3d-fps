@@ -23,12 +23,19 @@ void weapon_free(struct Weapon *w)
 }
 
 
-void weapon_move(struct Weapon *w, struct Camera *c)
+void weapon_move(struct Weapon *w, struct Camera *c, bool absolute)
 {
-    Vec3f pos = vec_addv(c->pos, render_rotate_cc(w->pos, c->angle));
+    Vec3f pos;
+
+    if (absolute)
+        pos = w->pos;
+    else
+        pos = vec_addv(c->pos, render_rotate_cc(w->pos, c->angle));
+
     w->mesh->pos = vec_addv(w->mesh->pos, vec_divf(vec_sub(pos, w->mesh->pos), w->divisor));
 
-    w->mesh->rot = vec_addv(w->mesh->rot, vec_divf(vec_sub(vec_addv(c->angle, w->angle), w->mesh->rot), w->divisor));
+    if (!absolute)
+        w->mesh->rot = vec_addv(w->mesh->rot, vec_divf(vec_sub(vec_addv(c->angle, w->angle), w->mesh->rot), w->divisor));
 }
 
 

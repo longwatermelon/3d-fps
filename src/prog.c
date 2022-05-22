@@ -60,6 +60,9 @@ void prog_mainloop(struct Prog *p)
     p->solids[0]->bculling = false;
     p->solids[1] = mesh_alloc((Vec3f){ 0.f, 0.f, 13.f }, (Vec3f){ .4f, .1f, .3f }, "res/big.obj", solid_col);
 
+    p->enemies = malloc(sizeof(struct Enemy*) * ++p->nenemies);
+    p->enemies[0] = enemy_alloc((Vec3f){ 0.f, 5.f, 0.f });
+
     while (p->running)
     {
         if (p->player->health > 0)
@@ -160,7 +163,7 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
         {
             if (p->player->weapon == p->player->gun)
             {
-                struct Enemy *e;
+                struct Enemy *e = 0;
                 bool hit = prog_player_shoot(p, &e);
                 p->player->gun->mesh->pos.y -= .1f;
                 p->player->gun->mesh->rot.y += .2f;
@@ -171,8 +174,9 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
             else if (p->player->weapon == p->player->knife)
             {
                 p->player->knife_thrown = true;
-                p->player->knife->pos = (Vec3f){ 0.f, 0.f, 90.f };
+                p->player->knife->pos = vec_addv(p->player->cam->pos, render_rotate_cc((Vec3f){ 0.f, 0.f, 90.f }, p->player->cam->angle));
                 p->player->knife->divisor = 10.f;
+                p->player->knife->default_pos = vec_addv(p->player->cam->pos, render_rotate_cc(p->player->weapon->pos, p->player->cam->angle));
             }
         }
 
@@ -289,17 +293,14 @@ void prog_player(struct Prog *p)
     if (p->player->knife_thrown)
     {
         struct Weapon *w = p->player->weapon;
-        Vec3f pos = vec_addv(p->player->cam->pos, render_rotate_cc(w->pos, p->player->cam->angle));
-        Vec3f new = vec_addv(w->mesh->pos, vec_divf(vec_sub(pos, w->mesh->pos), w->divisor));
-
-        float dist = vec_len(vec_sub(new, w->mesh->pos));
+        float dist = vec_len(vec_divf(vec_sub(w->pos, w->mesh->pos), w->divisor));
+        Vec3f dir = vec_normalize(vec_sub(w->pos, w->mesh->pos));
 
         for (size_t i = 0; i < p->nenemies; ++i)
         {
-            Vec3f dir = render_rotate_cc(vec_normalize(vec_sub(w->default_pos, w->pos)), p->player->cam->angle);
             float t;
 
-            if (enemy_ray_intersect(p->enemies[i], p->player->knife->mesh->pos, dir, &t))
+            if (enemy_ray_intersect(p->enemies[i], w->mesh->pos, dir, &t))
             {
                 if (t <= dist)
                     enemy_hurt(p->enemies[i], 5);
