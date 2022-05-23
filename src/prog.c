@@ -259,6 +259,9 @@ void prog_events_keystate(struct Prog *p)
         move.z -= speed * cosf(-M_PI / 2.f + cam->angle.x);
     }
 
+    if (p->player->scoped)
+        move = vec_mulf(move, .25f);
+
     p->player->vel.x = move.x;
     p->player->vel.z = move.z;
 }
