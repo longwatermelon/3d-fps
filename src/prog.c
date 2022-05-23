@@ -93,7 +93,10 @@ void prog_mainloop(struct Prog *p)
         for (size_t i = 0; i < p->nsolids; ++i)
         {
             if (p->score >= 30)
+            {
                 p->solids[i]->rot.z += .007f;
+                p->solids[i]->rot.y += .007f;
+            }
         }
 
         audio_stop_finished_sounds();
