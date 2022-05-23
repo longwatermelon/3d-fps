@@ -95,7 +95,7 @@ void prog_mainloop(struct Prog *p)
             if (p->score >= 30)
             {
                 p->solids[i]->rot.z += .007f;
-                p->solids[i]->rot.y += .007f;
+                p->solids[i]->rot.y += .003f;
             }
         }
 
