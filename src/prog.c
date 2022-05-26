@@ -340,9 +340,9 @@ void prog_enemies(struct Prog *p)
         int type;
         int rng = rand() % 100;
 
-        if (rng < 60)
+        if (rng < 70)
             type = ENEMY_NORMAL;
-        else if (rng < 70)
+        else if (rng < 85)
             type = ENEMY_DODGE;
         else
             type = ENEMY_THROW;
