@@ -31,3 +31,7 @@ cd rasterize
 make INCLUDE=$(brew --prefix)/include LIBRARIES=$(brew --prefix)/lib
 ./rasterize
 ```
+
+## Windows
+
+Good luck buddy
