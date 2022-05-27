@@ -28,7 +28,7 @@ make
 ```
 git clone https://github.com/longwatermelon/rasterize
 cd rasterize
-make INCLUDE=-I$(brew --prefix)/include LIBRARIES=-L$(brew --prefix)/lib
+make INCLUDE=-I$(brew --prefix)/include LIBRARIES=-L$(brew --prefix)/lib -Wno-error=unused-command-line-argument
 ./rasterize
 ```
 

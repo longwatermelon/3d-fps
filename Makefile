@@ -3,6 +3,7 @@ CFLAGS=-std=gnu17 -ggdb -Wall -Wpedantic -Werror
 LIBS=-lm -lSDL2 -lSDL2_ttf -lSDL2_mixer
 INC=
 
+CFLAGS+=$(FLAGS)
 LIBS+=$(LIBRARIES)
 INC+=$(INCLUDE)
 
