@@ -15,7 +15,7 @@ https://user-images.githubusercontent.com/73869536/170606088-16030e14-2f13-4611-
 
 # Building
 Dependencies: sdl2, sdl2_ttf, sdl2_mixer
-  
+
 ## Linux
 ```
 git clone https://github.com/longwatermelon/rasterize
@@ -25,6 +25,8 @@ make
 ```
 
 ## MacOS
+Requires [brew](https://brew.sh)
+
 ```
 git clone https://github.com/longwatermelon/rasterize
 cd rasterize
