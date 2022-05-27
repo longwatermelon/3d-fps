@@ -28,7 +28,7 @@ make
 ```
 git clone https://github.com/longwatermelon/rasterize
 cd rasterize
-make INCLUDE=$(brew --prefix)/include LIBRARIES=$(brew --prefix)/lib
+make INCLUDE=-I$(brew --prefix)/include LIBRARIES=-L$(brew --prefix)/lib
 ./rasterize
 ```
 
