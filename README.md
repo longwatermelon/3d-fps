@@ -30,7 +30,7 @@ Requires [brew](https://brew.sh)
 ```
 git clone https://github.com/longwatermelon/rasterize
 cd rasterize
-make INCLUDE=-I$(brew --prefix)/include LIBRARIES=-L$(brew --prefix)/lib -Wno-error=unused-command-line-argument
+make INCLUDE=-I$(brew --prefix)/include LIBRARIES=-L$(brew --prefix)/lib FLAGS=-Wno-error=unused-command-line-argument
 ./rasterize
 ```
 
