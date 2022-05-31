@@ -11,6 +11,8 @@ First person shooter
 * 1: equip gun
 * 2: equip knife
 
+Obs destroys performance for some reason
+
 https://user-images.githubusercontent.com/73869536/170606088-16030e14-2f13-4611-9138-587edc00f709.mp4
 
 # Building
