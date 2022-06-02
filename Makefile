@@ -21,5 +21,5 @@ obj/src/%.o: src/%.c
 	$(CC) $(CFLAGS) $(INC) -c $< -o $@ $(LIBS)
 
 clean:
-	-rm -rf obj rasterize
+	-rm -rf obj a.out
 
