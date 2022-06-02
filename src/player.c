@@ -20,7 +20,7 @@ struct Player *player_alloc()
 
     p->weapon = p->gun;
 
-    p->health = 10;
+    p->health = 5;
     p->last_hurt = 0;
 
     return p;

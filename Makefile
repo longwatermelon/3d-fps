@@ -15,7 +15,7 @@ all:
 	$(MAKE) rasterize
 
 rasterize: $(OBJS)
-	$(CC) $(CFLAGS) $(INC) $^ -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(INC) $^ $(LIBS)
 
 obj/src/%.o: src/%.c
 	$(CC) $(CFLAGS) $(INC) -c $< -o $@ $(LIBS)
