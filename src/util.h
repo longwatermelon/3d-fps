@@ -3,6 +3,7 @@
 
 #include "vector.h"
 #include "light.h"
+#include <time.h>
 #include <sys/types.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>

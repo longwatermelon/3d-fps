@@ -29,6 +29,9 @@ struct Prog
     size_t nenemies;
 
     int score;
+
+    Vec3f cam_shake;
+    Uint32 shake_begin;
 };
 
 struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r);

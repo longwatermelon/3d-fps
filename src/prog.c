@@ -37,6 +37,9 @@ struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r)
     p->ri.lights[0] = p->player->light;
     p->ri.lights[1] = p->player->gun_light;
 
+    p->cam_shake = (Vec3f){ 0, 0, 0 };
+    p->shake_begin = -100;
+
     return p;
 }
 
@@ -119,7 +122,26 @@ void prog_mainloop(struct Prog *p)
 
         SDL_RenderClear(p->ri.rend);
 
+        p->player->cam->pos = vec_addv(p->player->cam->pos, p->cam_shake);
         prog_render(p);
+        p->player->cam->pos = vec_sub(p->player->cam->pos, p->cam_shake);
+
+        if (now - p->shake_begin < 70)
+        {
+            p->cam_shake = vec_addv(p->cam_shake, (Vec3f){
+                (float)(rand() % 100 - 50) / 300,
+                -(float)(rand() % 50) / 300,
+                (float)(rand() % 100 - 50) / 300
+            });
+
+            p->cam_shake.x = fmin(fmax(p->cam_shake.x, -3), 3);
+            p->cam_shake.y = fmin(fmax(p->cam_shake.y, -3), 3);
+            p->cam_shake.z = fmin(fmax(p->cam_shake.z, -3), 3);
+        }
+        else
+        {
+            p->cam_shake = (Vec3f){ 0, 0, 0 };
+        }
 
         SDL_UpdateTexture(p->scrtex, 0, p->ri.scr, 800 * sizeof(uint32_t));
         SDL_RenderCopy(p->ri.rend, p->scrtex, 0, 0);
@@ -264,6 +286,7 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
 
                 audio_play_sound("res/sfx/gunshot.wav");
                 p->player->gun_light->in = 10.f;
+                p->shake_begin = SDL_GetTicks() + 50;
 
                 if (hit)
                     p->score += enemy_hurt(e, 1);
@@ -272,6 +295,7 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
             {
                 if (!p->player->knife_thrown)
                 {
+                    p->shake_begin = SDL_GetTicks();
                     audio_play_sound("res/sfx/slash.wav");
                     p->player->knife->absolute = true;
                     p->player->knife_thrown = true;
@@ -484,7 +508,7 @@ void prog_render(struct Prog *p)
     for (size_t i = 0; i < p->nenemies; ++i)
         enemy_render(p->enemies[i], &p->ri, p->player->cam);
 
-    player_render(p->player, &p->ri);
+    player_render(p->player, &p->ri, p->cam_shake);
 }
 
 
