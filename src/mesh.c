@@ -178,7 +178,13 @@ float dist = vec_len(vec_sub(sc->lights[i]->pos, hit));
 
             if (dlight > .01f)
             {
-                SDL_Color col = { fmin(dlight * m->col.r, 255), fmin(dlight * m->col.g, 255), fmin(dlight * m->col.b, 255) };
+                Vec3f r = vec_sub(l, vec_mulf(vec_mulf(norm, 2.f), vec_dot(l, norm)));
+                float slight = b * powf(fmax(0.f, vec_dot(r, vec_normalize(mpts[0]))), 90.f);
+                SDL_Color col = {
+                    fmin(slight + dlight * m->col.r, 255),
+                    fmin(slight + dlight * m->col.g, 255),
+                    fmin(slight + dlight * m->col.b, 255)
+                };
                 render_filled_tri(points, zvals, scr, zbuf, col);
             }
             /* SDL_RenderDrawLine(rend, points[0].x, points[0].y, points[1].x, points[1].y); */
