@@ -113,13 +113,19 @@ void mesh_render(struct Mesh *m, uint32_t *scr, struct Camera *c)
 
     for (size_t i = 0; i < m->ntris; ++i)
     {
-        float tri_dist = vec_len(vec_sub(c->pos, vec_addv(render_rotate_cc(m->pts[m->tris[i].idx[0]], m->rot), m->pos)));
+        Vec3f mpts[3] = {
+            vec_addv(render_rotate_cc(m->pts[m->tris[i].idx[0]], m->rot), m->pos),
+            vec_addv(render_rotate_cc(m->pts[m->tris[i].idx[1]], m->rot), m->pos),
+            vec_addv(render_rotate_cc(m->pts[m->tris[i].idx[2]], m->rot), m->pos)
+        };
+
+        float tri_dist = vec_len(vec_sub(c->pos, mpts[0]));
         if (tri_dist > 20.f)
             continue;
 
         if (m->bculling)
         {
-            Vec3f v = vec_addv(render_rotate_cc(m->pts[m->tris[i].idx[0]], m->rot), m->pos);
+            Vec3f v = mpts[0];
             Vec3f vp = vec_sub(v, c->pos);
 
             if (vec_dot(vp, render_rotate_cc(m->norms[m->tris[i].nidx], m->rot)) >= 0.f)
@@ -131,15 +137,14 @@ void mesh_render(struct Mesh *m, uint32_t *scr, struct Camera *c)
 
         for (int j = 0; j < 3; ++j)
         {
-            Vec3f orig_p = render_rotate_cc(m->pts[m->tris[i].idx[j]], m->rot);
-            Vec3f p = vec_addv(orig_p, m->pos);
+            Vec3f p = mpts[j];
             p = vec_sub(p, c->pos);
-
             p = render_rotate_ccw(p, c->angle);
 
             if (p.z < .5f)
             {
                 render = false;
+                break;
             }
             else
             {
