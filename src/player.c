@@ -109,24 +109,6 @@ bool player_check_dir(struct Player *p, Vec3f dir, struct Mesh **solids, size_t 
 void player_render(struct Player *p, SDL_Renderer *rend, uint32_t *scr, float *zbuf, TTF_Font *font)
 {
     weapon_render(p->weapon, scr, zbuf, p->cam);
-
-    if (clock() - p->last_hurt < CLOCKS_PER_SEC && clock() > CLOCKS_PER_SEC)
-    {
-        SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_BLEND);
-        SDL_SetRenderDrawColor(rend, 255, 0, 0, (1.f - (float)(clock() - p->last_hurt) / (float)CLOCKS_PER_SEC) * 255.f);
-        SDL_RenderFillRect(rend, 0);
-        SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_NONE);
-    }
-
-    char s[100] = { 0 };
-    sprintf(s, "Health: %d", p->health);
-
-    SDL_Texture *tex = render_text(rend, font, s);
-    SDL_Rect r = { 20, 30 };
-    SDL_QueryTexture(tex, 0, 0, &r.w, &r.h);
-    SDL_RenderCopy(rend, tex, 0, &r);
-
-    SDL_DestroyTexture(tex);
 }
 
 

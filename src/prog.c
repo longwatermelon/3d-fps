@@ -110,6 +110,48 @@ void prog_mainloop(struct Prog *p)
 
         prog_render(p);
 
+        SDL_UpdateTexture(p->scrtex, 0, p->scr, 800 * sizeof(uint32_t));
+        SDL_RenderCopy(p->rend, p->scrtex, 0, 0);
+
+        {
+            if (p->player->scoped)
+            {
+                SDL_SetRenderDrawColor(p->rend, 255, 255, 255, 255);
+                SDL_RenderDrawLine(p->rend, 400 - 10, 400 - 10, 400 + 10, 400 + 10);
+                SDL_RenderDrawLine(p->rend, 400 + 10, 400 - 10, 400 - 10, 400 + 10);
+            }
+
+            if (clock() - p->player->last_hurt < CLOCKS_PER_SEC && clock() > CLOCKS_PER_SEC)
+            {
+                SDL_SetRenderDrawBlendMode(p->rend, SDL_BLENDMODE_BLEND);
+                SDL_SetRenderDrawColor(p->rend, 255, 0, 0, (1.f - (float)(clock() - p->player->last_hurt) / (float)CLOCKS_PER_SEC) * 255.f);
+                SDL_RenderFillRect(p->rend, 0);
+                SDL_SetRenderDrawBlendMode(p->rend, SDL_BLENDMODE_NONE);
+            }
+
+            char s[100] = { 0 };
+            sprintf(s, "Health: %d", p->player->health);
+
+            SDL_Texture *tex = render_text(p->rend, p->font, s);
+            SDL_Rect r = { 20, 30 };
+            SDL_QueryTexture(tex, 0, 0, &r.w, &r.h);
+            SDL_RenderCopy(p->rend, tex, 0, &r);
+
+            SDL_DestroyTexture(tex);
+        }
+
+        {
+            char score[100] = { 0 };
+            sprintf(score, "Score: %d", p->score);
+
+            SDL_Texture *tex = render_text(p->rend, p->font, score);
+            SDL_Rect r = { 20, 60 };
+            SDL_QueryTexture(tex, 0, 0, &r.w, &r.h);
+
+            SDL_RenderCopy(p->rend, tex, 0, &r);
+            SDL_DestroyTexture(tex);
+        }
+
         if (p->player->health <= 0)
         {
             SDL_SetRenderDrawColor(p->rend, 0, 0, 0, 100);
@@ -119,9 +161,6 @@ void prog_mainloop(struct Prog *p)
         }
 
         SDL_SetRenderDrawColor(p->rend, 0, 0, 0, 255);
-
-        SDL_UpdateTexture(p->scrtex, 0, p->scr, 800 * sizeof(uint32_t));
-        SDL_RenderCopy(p->rend, p->scrtex, 0, 0);
         SDL_RenderPresent(p->rend);
 
         prog_reset_buffers(p);
@@ -435,23 +474,6 @@ void prog_render(struct Prog *p)
         enemy_render(p->enemies[i], p->scr, p->zbuf, p->player->cam);
 
     player_render(p->player, p->rend, p->scr, p->zbuf, p->font);
-
-    if (p->player->scoped)
-    {
-        SDL_SetRenderDrawColor(p->rend, 255, 255, 255, 255);
-        SDL_RenderDrawLine(p->rend, 400 - 10, 400 - 10, 400 + 10, 400 + 10);
-        SDL_RenderDrawLine(p->rend, 400 + 10, 400 - 10, 400 - 10, 400 + 10);
-    }
-
-    char score[100] = { 0 };
-    sprintf(score, "Score: %d", p->score);
-
-    SDL_Texture *tex = render_text(p->rend, p->font, score);
-    SDL_Rect r = { 20, 60 };
-    SDL_QueryTexture(tex, 0, 0, &r.w, &r.h);
-
-    SDL_RenderCopy(p->rend, tex, 0, &r);
-    SDL_DestroyTexture(tex);
 }
 
 

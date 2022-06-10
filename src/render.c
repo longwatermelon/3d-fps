@@ -10,21 +10,7 @@
     x = y; \
     y = tmp; }
 
-RTI *rti_alloc(float x, float z, float sx, float sz)
-{
-    RTI *rti = malloc(sizeof(RTI));
-    rti->x = x;
-    rti->z = z;
-    rti->sx = sx;
-    rti->sz = sz;
-
-    return rti;
-}
-
-void rti_free(RTI *rti)
-{
-    free(rti);
-}
+RTI g_r01, g_r02, g_r12;
 
 SDL_Point render_project_point(Vec3f p)
 {
@@ -135,21 +121,19 @@ void render_filled_tri(SDL_Point p[3], float z[3], uint32_t *screen, float *zbuf
     float s20 = (float)(p2.y - p0.y) / (p2.x - p0.x);
     float s21 = (float)(p2.y - p1.y) / (p2.x - p1.x);
 
-    RTI *r02 = rti_alloc(p0.x, z0, s20, (float)(z2 - z0) / (p2.y - p0.y));
-    RTI *r01 = rti_alloc(p0.x, z0, s10, (float)(z1 - z0) / (p1.y - p0.y));
-    RTI *r12 = rti_alloc(p1.x, z1, s21, (float)(z2 - z1) / (p2.y - p1.y));
+    g_r02 = (RTI){ .x = p0.x, .z = z0, .sx = s20, .sz = (float)(z2 - z0) / (p2.y - p0.y) };
+    g_r01 = (RTI){ .x = p0.x, .z = z0, .sx = s10, .sz = (float)(z1 - z0) / (p1.y - p0.y) };
+    g_r12 = (RTI){ .x = p1.x, .z = z1, .sx = s21, .sz = (float)(z2 - z1) / (p2.y - p1.y) };
 
-    render_fill_edges(p0.y, p1.y, r02, r01, screen, zbuf, col);
-    render_fill_edges(p1.y, p2.y, r02, r12, screen, zbuf, col);
-
-    rti_free(r02);
-    rti_free(r01);
-    rti_free(r12);
+    render_fill_edges(p0.y, p1.y, &g_r02, &g_r01, screen, zbuf, col);
+    render_fill_edges(p1.y, p2.y, &g_r02, &g_r12, screen, zbuf, col);
 }
 
 
 void render_fill_edges(int top, int bot, RTI *l1, RTI *l2, uint32_t *screen, float *zbuf, SDL_Color col)
 {
+    uint32_t hex_col = 0x00000000 | col.r << 16 | col.g << 8 | col.b;
+
     for (int y = top; y < bot; ++y)
     {
         int min = roundf(l1->x > l2->x ? l2->x : l1->x);
@@ -177,7 +161,7 @@ void render_fill_edges(int top, int bot, RTI *l1, RTI *l2, uint32_t *screen, flo
             {
                 if (z < zbuf[idx])
                 {
-                    screen[idx] = 0x00000000 | col.r << 16 | col.g << 8 | col.b;
+                    screen[idx] = hex_col;
                     zbuf[idx] = z;
                 }
             }

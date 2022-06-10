@@ -10,9 +10,6 @@ typedef struct
     float x, z, sx, sz;
 } RTI;
 
-RTI *rti_alloc(float x, float z, float sx, float sz);
-void rti_free(RTI *rti);
-
 SDL_Point render_project_point(Vec3f p);
 
 Vec3f render_rotate_ccw(Vec3f p, Vec3f angle);
