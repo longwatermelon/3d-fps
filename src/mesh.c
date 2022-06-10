@@ -128,7 +128,7 @@ void mesh_render(struct Mesh *m, uint32_t *scr, struct Camera *c)
         if (m->bculling)
         {
             Vec3f v = mpts[0];
-            Vec3f vp = vec_sub(v, c->pos);
+            Vec3f vp = vec_normalize(vec_sub(v, c->pos));
 
             if (vec_dot(vp, norm) >= 0.f)
                 continue;

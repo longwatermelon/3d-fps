@@ -124,7 +124,7 @@ float render_fill_edges(float x1, float x2, int top, int bot, float s1, float s2
             int idx = y * 800 + (int)i;
 
             if (idx >= 0 && idx < 800 * 800)
-                screen[y * 800 + (int)i] = 0x00000000 | col.r << 16 | col.g << 8 | col.b;
+                screen[idx] = 0x00000000 | col.r << 16 | col.g << 8 | col.b;
         }
 
         x1 += 1.f / s1;
