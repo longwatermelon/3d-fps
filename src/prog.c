@@ -359,21 +359,6 @@ void prog_enemies(struct Prog *p)
             memmove(p->enemies + i, p->enemies + i + 1, (--p->nenemies - i) * sizeof(struct Enemy*));
         }
 
-        /* if (p->enemies[i]->type == ENEMY_DODGE) */
-        /* { */
-        /*     float t; */
-        /*     Vec3f pdir = render_rotate_cc((Vec3f){ 0.f, 0.f, 1.f }, p->player->cam->angle); */
-
-        /*     if (p->player->knife_thrown && enemy_ray_intersect(p->enemies[i], p->player->cam->pos, pdir, &t)) */
-        /*     { */
-        /*         if (vec_dot(vec_sub(p->enemies[i]->body[0]->pos, p->player->cam->pos), pdir) >= 0.f) */
-        /*         { */
-        /*             Vec3f dst = vec_addv(p->player->cam->pos, vec_mulf(pdir, -10.f)); */
-        /*             enemy_move(p->enemies[i], p->rend, vec_sub(dst, p->enemies[i]->pos)); */
-        /*         } */
-        /*     } */
-        /* } */
-
         if (p->enemies[i]->type == ENEMY_THROW)
         {
             for (size_t j = 0; j < p->enemies[i]->nbody; ++j)
