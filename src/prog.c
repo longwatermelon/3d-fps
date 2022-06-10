@@ -15,7 +15,7 @@ struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r)
     p->rend = r;
 
     p->scrtex = SDL_CreateTexture(r, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, 800, 800);
-    memset(p->scr, 0, sizeof(uint32_t) * 800 * 800);
+    prog_reset_buffers(p);
 
     p->font = TTF_OpenFont("res/font.ttf", 16);
 
@@ -72,7 +72,7 @@ void prog_mainloop(struct Prog *p)
     SDL_Color solid_col = { 170, 170, 170 };
 
     p->solids[0] = mesh_alloc((Vec3f){ 0.f, 5.f, 0.f }, /*(Vec3f){ .2f, .1f, .3f }*/(Vec3f){ 0.f, 0.f, 0.f }, "res/plane.obj", solid_col);
-//    p->solids[0]->bculling = false;
+    p->solids[0]->bculling = false;
     p->solids[1] = mesh_alloc((Vec3f){ 0.f, 0.f, 13.f }, (Vec3f){ .4f, .1f, .3f }, "res/big.obj", solid_col);
 
     while (p->running)
@@ -124,7 +124,7 @@ void prog_mainloop(struct Prog *p)
         SDL_RenderCopy(p->rend, p->scrtex, 0, 0);
         SDL_RenderPresent(p->rend);
 
-        memset(p->scr, 0, sizeof(uint32_t) * 800 * 800);
+        prog_reset_buffers(p);
 
         if (p->score != prev_score && prev_score < 30 && p->score >= 30)
         {
@@ -487,5 +487,15 @@ bool prog_player_shoot(struct Prog *p, struct Enemy **e)
     }
 
     return et < st;
+}
+
+
+void prog_reset_buffers(struct Prog *p)
+{
+    for (int i = 0; i < 800 * 800; ++i)
+    {
+        p->scr[i] = 0x00000000;
+        p->zbuf[i] = INFINITY;
+    }
 }
 

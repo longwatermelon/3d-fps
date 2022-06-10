@@ -168,6 +168,11 @@ float dist = vec_len(vec_sub(sc->lights[i]->pos, hit));
             Vec3f l = vec_normalize(vec_sub(c->pos, mpts[0]));
             float dlight = b * fmax(0.f, vec_dot(l, norm));
 
+            if (dlight == 0.f)
+            {
+                dlight = b * fmax(0.f, vec_dot(l, vec_mulf(norm, -1.f)));
+            }
+
             if (dlight > .05f)
             {
                 SDL_Color col = { fmin(dlight * m->col.r, 255), fmin(dlight * m->col.g, 255), fmin(dlight * m->col.b, 255) };

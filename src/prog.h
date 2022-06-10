@@ -18,6 +18,7 @@ struct Prog
 
     SDL_Texture *scrtex;
     uint32_t scr[800 * 800];
+    float zbuf[800 * 800];
 
     TTF_Font *font;
 
@@ -49,6 +50,8 @@ void prog_player(struct Prog *p);
 void prog_render(struct Prog *p);
 
 bool prog_player_shoot(struct Prog *p, struct Enemy **e);
+
+void prog_reset_buffers(struct Prog *p);
 
 #endif
 
