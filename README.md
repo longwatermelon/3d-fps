@@ -11,9 +11,7 @@ First person shooter
 * 1: equip gun
 * 2: equip knife
 
-Obs destroys performance for some reason
-
-https://user-images.githubusercontent.com/73869536/170606088-16030e14-2f13-4611-9138-587edc00f709.mp4
+https://user-images.githubusercontent.com/73869536/173017282-020416db-fb55-4f4f-b90a-31075f5786f0.mp4
 
 # Building
 Dependencies: sdl2, sdl2_ttf, sdl2_mixer
