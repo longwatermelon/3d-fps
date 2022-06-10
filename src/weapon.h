@@ -18,7 +18,7 @@ void weapon_free(struct Weapon *w);
 
 void weapon_move(struct Weapon *w, struct Camera *c);
 
-void weapon_render(struct Weapon *w, SDL_Renderer *rend, struct Camera *c);
+void weapon_render(struct Weapon *w, uint32_t *scr, struct Camera *c);
 
 Vec3f weapon_coords(struct Weapon *w, Vec3f c, struct Camera *cam);
 

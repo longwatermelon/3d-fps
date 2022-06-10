@@ -16,6 +16,9 @@ struct Prog
     SDL_Window *window;
     SDL_Renderer *rend;
 
+    SDL_Texture *scrtex;
+    uint32_t scr[800 * 800];
+
     TTF_Font *font;
 
     bool focused;

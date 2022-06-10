@@ -14,6 +14,9 @@ struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r)
     p->window = w;
     p->rend = r;
 
+    p->scrtex = SDL_CreateTexture(r, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, 800, 800);
+    memset(p->scr, 0, sizeof(uint32_t) * 800 * 800);
+
     p->font = TTF_OpenFont("res/font.ttf", 16);
 
     SDL_WarpMouseInWindow(p->window, 400, 400);
@@ -52,6 +55,8 @@ void prog_free(struct Prog *p)
 
     free(p->enemies);
 
+    SDL_DestroyTexture(p->scrtex);
+
     free(p);
 }
 
@@ -66,8 +71,8 @@ void prog_mainloop(struct Prog *p)
 
     SDL_Color solid_col = { 170, 170, 170 };
 
-    p->solids[0] = mesh_alloc((Vec3f){ 0.f, 5.f, 0.f }, (Vec3f){ .2f, .1f, .3f }, "res/plane.obj", solid_col);
-    p->solids[0]->bculling = false;
+    p->solids[0] = mesh_alloc((Vec3f){ 0.f, 5.f, 0.f }, /*(Vec3f){ .2f, .1f, .3f }*/(Vec3f){ 0.f, 0.f, 0.f }, "res/plane.obj", solid_col);
+//    p->solids[0]->bculling = false;
     p->solids[1] = mesh_alloc((Vec3f){ 0.f, 0.f, 13.f }, (Vec3f){ .4f, .1f, .3f }, "res/big.obj", solid_col);
 
     while (p->running)
@@ -114,7 +119,12 @@ void prog_mainloop(struct Prog *p)
         }
 
         SDL_SetRenderDrawColor(p->rend, 0, 0, 0, 255);
+
+        SDL_UpdateTexture(p->scrtex, 0, p->scr, 800 * sizeof(uint32_t));
+        SDL_RenderCopy(p->rend, p->scrtex, 0, 0);
         SDL_RenderPresent(p->rend);
+
+        memset(p->scr, 0, sizeof(uint32_t) * 800 * 800);
 
         if (p->score != prev_score && prev_score < 30 && p->score >= 30)
         {
@@ -333,6 +343,7 @@ void prog_enemies(struct Prog *p)
         }
     }
 
+#if 0
     if (rand() % 300 < 5 && p->nenemies < 3)
     {
         p->enemies = realloc(p->enemies, sizeof(struct Enemy*) * ++p->nenemies);
@@ -349,6 +360,7 @@ void prog_enemies(struct Prog *p)
 
         p->enemies[p->nenemies - 1] = enemy_alloc((Vec3f){ rand() % 40 - 20, rand() % 40 - 20, rand() % 40 - 20 }, type);
     }
+#endif
 
     for (size_t i = 0; i < p->nenemies; ++i)
     {
@@ -419,12 +431,12 @@ void prog_player(struct Prog *p)
 void prog_render(struct Prog *p)
 {
     for (size_t i = 0; i < p->nsolids; ++i)
-        mesh_render(p->solids[i], p->rend, p->player->cam);
+        mesh_render(p->solids[i], p->scr, p->player->cam);
 
     for (size_t i = 0; i < p->nenemies; ++i)
-        enemy_render(p->enemies[i], p->rend, p->player->cam);
+        enemy_render(p->enemies[i], p->scr, p->player->cam);
 
-    player_render(p->player, p->rend, p->font);
+    player_render(p->player, p->rend, p->scr, p->font);
 
     if (p->player->scoped)
     {
