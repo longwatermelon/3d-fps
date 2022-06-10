@@ -5,6 +5,27 @@
     x = y; \
     y = tmp; }
 
+#define swapf(x, y) { \
+    float tmp = x; \
+    x = y; \
+    y = tmp; }
+
+RTI *rti_alloc(float x, float z, float sx, float sz)
+{
+    RTI *rti = malloc(sizeof(RTI));
+    rti->x = x;
+    rti->z = z;
+    rti->sx = sx;
+    rti->sz = sz;
+
+    return rti;
+}
+
+void rti_free(RTI *rti)
+{
+    free(rti);
+}
+
 SDL_Point render_project_point(Vec3f p)
 {
     float px = 0.f, py = 0.f;
@@ -87,30 +108,52 @@ SDL_Texture *render_text(SDL_Renderer *rend, TTF_Font *font, const char *s)
 }
 
 
-void render_filled_tri(SDL_Point p[3], uint32_t *screen, SDL_Color col)
+void render_filled_tri(SDL_Point p[3], float z[3], uint32_t *screen, SDL_Color col)
 {
     SDL_Point p0 = p[0], p1 = p[1], p2 = p[2];
-    if (p0.y > p1.y) swapp(p0, p1);
-    if (p0.y > p2.y) swapp(p0, p2);
-    if (p1.y > p2.y) swapp(p1, p2);
+    float z0 = z[0], z1 = z[1], z2 = z[2];
+
+    if (p0.y > p1.y)
+    {
+        swapp(p0, p1);
+        swapf(z0, z1);
+    }
+
+    if (p0.y > p2.y)
+    {
+        swapp(p0, p2);
+        swapf(z0, z2);
+    }
+
+    if (p1.y > p2.y)
+    {
+        swapp(p1, p2);
+        swapf(z1, z2);
+    }
 
     float s10 = (float)(p1.y - p0.y) / (p1.x - p0.x);
     float s20 = (float)(p2.y - p0.y) / (p2.x - p0.x);
     float s21 = (float)(p2.y - p1.y) / (p2.x - p1.x);
 
-    float x1 = render_fill_edges(p0.x, p0.x, p0.y, p1.y, s20, s10, screen, col);
-    render_fill_edges(x1, p1.x, p1.y, p2.y, s20, s21, screen, col);
+    RTI *r02 = rti_alloc(p0.x, z0, s20, (float)(z2 - z0) / (p2.y - p0.y));
+    RTI *r01 = rti_alloc(p0.x, z0, s10, (float)(z1 - z0) / (p1.y - p0.y));
+    RTI *r12 = rti_alloc(p1.x, z1, s21, (float)(z2 - z1) / (p2.y - p1.y));
+
+    render_fill_edges(p0.y, p1.y, r02, r01, screen, col);
+    render_fill_edges(p1.y, p2.y, r02, r12, screen, col);
+
+    rti_free(r02);
+    rti_free(r01);
+    rti_free(r12);
 }
 
 
-float render_fill_edges(float x1, float x2, int top, int bot, float s1, float s2, uint32_t *screen, SDL_Color col)
+void render_fill_edges(int top, int bot, RTI *l1, RTI *l2, uint32_t *screen, SDL_Color col)
 {
     for (int y = top; y < bot; ++y)
     {
-        /* x1 = fmin(fmax(x1, 0.f), 800.f); */
-        /* x2 = fmin(fmax(x2, 0.f), 800.f); */
-        int min = roundf(x1 > x2 ? x2 : x1);
-        int max = roundf(x1 > x2 ? x1 : x2);
+        int min = roundf(l1->x > l2->x ? l2->x : l1->x);
+        int max = roundf(l1->x > l2->x ? l1->x : l2->x);
 
         for (int i = min; i < max; ++i)
         {
@@ -127,10 +170,8 @@ float render_fill_edges(float x1, float x2, int top, int bot, float s1, float s2
                 screen[idx] = 0x00000000 | col.r << 16 | col.g << 8 | col.b;
         }
 
-        x1 += 1.f / s1;
-        x2 += 1.f / s2;
+        l1->x += 1.f / l1->sx;
+        l2->x += 1.f / l2->sx;
     }
-
-    return x1;
 }
 
