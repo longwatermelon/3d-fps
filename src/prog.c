@@ -166,6 +166,14 @@ void prog_mainloop(struct Prog *p)
             SDL_SetRenderDrawBlendMode(p->rend, SDL_BLENDMODE_BLEND);
             SDL_RenderFillRect(p->rend, 0);
             SDL_SetRenderDrawBlendMode(p->rend, SDL_BLENDMODE_NONE);
+
+            SDL_Texture *tex = render_text(p->rend, p->font, "Press [q] to restart");
+            SDL_Rect r;
+            SDL_QueryTexture(tex, 0, 0, &r.w, &r.h);
+            r.x = 400 - (r.w / 2);
+            r.y = 400 - (r.h / 2);
+            SDL_RenderCopy(p->rend, tex, 0, &r);
+            SDL_DestroyTexture(tex);
         }
 
         SDL_SetRenderDrawColor(p->rend, 0, 0, 0, 255);
