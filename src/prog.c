@@ -71,12 +71,20 @@ void prog_mainloop(struct Prog *p)
 
     SDL_Color solid_col = { 170, 170, 170 };
 
-    p->solids[0] = mesh_alloc((Vec3f){ 0.f, 5.f, 0.f }, /*(Vec3f){ .2f, .1f, .3f }*/(Vec3f){ 0.f, 0.f, 0.f }, "res/plane.obj", solid_col);
+    p->solids[0] = mesh_alloc((Vec3f){ 0.f, 5.f, 0.f }, (Vec3f){ .2f, .1f, .3f }, "res/plane.obj", solid_col);
     p->solids[0]->bculling = false;
     p->solids[1] = mesh_alloc((Vec3f){ 0.f, 0.f, 13.f }, (Vec3f){ .4f, .1f, .3f }, "res/big.obj", solid_col);
 
+    Uint32 now, last_frame = SDL_GetTicks();
+
     while (p->running)
     {
+        now = SDL_GetTicks();
+        if (now - last_frame < 1000.f / 60.f)
+            continue;
+
+        last_frame = now;
+
         int prev_score = p->score;
 
         if (p->player->health > 0)

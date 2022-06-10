@@ -109,8 +109,6 @@ void mesh_read(struct Mesh *m, const char *fp)
 
 void mesh_render(struct Mesh *m, uint32_t *scr, float *zbuf, struct Camera *c)
 {
-//    SDL_SetRenderDrawColor(rend, m->col.r, m->col.g, m->col.b, 255);
-
     for (size_t i = 0; i < m->ntris; ++i)
     {
         Vec3f mpts[3] = {
@@ -159,14 +157,6 @@ void mesh_render(struct Mesh *m, uint32_t *scr, float *zbuf, struct Camera *c)
 
         if (render)
         {
-#if 0
-float dist = vec_len(vec_sub(sc->lights[i]->pos, hit));
-        float b = fmin(sc->lights[i]->in / (.005f * dist * dist), sc->lights[i]->in);
-
-        // diffuse
-        Vec3f l = vec_normalize(vec_sub(sc->lights[i]->pos, hit));
-        dlight += b * fmax(0.f, vec_dot(l, norm));
-#endif
             float b = fmin(.8f / (.005f * tri_dist * tri_dist), .8f);
             Vec3f l = vec_normalize(vec_sub(c->pos, mpts[0]));
             float dlight = b * fmax(0.f, vec_dot(l, norm));
@@ -187,9 +177,6 @@ float dist = vec_len(vec_sub(sc->lights[i]->pos, hit));
                 };
                 render_filled_tri(points, zvals, scr, zbuf, col);
             }
-            /* SDL_RenderDrawLine(rend, points[0].x, points[0].y, points[1].x, points[1].y); */
-            /* SDL_RenderDrawLine(rend, points[0].x, points[0].y, points[2].x, points[2].y); */
-            /* SDL_RenderDrawLine(rend, points[1].x, points[1].y, points[2].x, points[2].y); */
         }
     }
 }
