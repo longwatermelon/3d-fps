@@ -35,7 +35,7 @@ void mesh_free(struct Mesh *m);
 
 void mesh_read(struct Mesh *m, const char *fp);
 
-void mesh_render(struct Mesh *m, uint32_t *scr, struct Camera *c);
+void mesh_render(struct Mesh *m, uint32_t *scr, float *zbuf, struct Camera *c);
 
 bool mesh_ray_intersect(struct Mesh *m, Vec3f ro, Vec3f rdir, float *t, Triangle *tri);
 bool mesh_ray_tri_intersect(struct Mesh *m, Triangle tri, Vec3f ro, Vec3f rdir, float *t);

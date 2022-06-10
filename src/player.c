@@ -106,9 +106,9 @@ bool player_check_dir(struct Player *p, Vec3f dir, struct Mesh **solids, size_t 
 }
 
 
-void player_render(struct Player *p, SDL_Renderer *rend, uint32_t *scr, TTF_Font *font)
+void player_render(struct Player *p, SDL_Renderer *rend, uint32_t *scr, float *zbuf, TTF_Font *font)
 {
-    weapon_render(p->weapon, scr, p->cam);
+    weapon_render(p->weapon, scr, zbuf, p->cam);
 
     if (clock() - p->last_hurt < CLOCKS_PER_SEC && clock() > CLOCKS_PER_SEC)
     {

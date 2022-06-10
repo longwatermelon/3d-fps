@@ -33,7 +33,7 @@ struct Enemy
 struct Enemy *enemy_alloc(Vec3f pos, int type);
 void enemy_free(struct Enemy *e);
 
-void enemy_render(struct Enemy *e, uint32_t *scr, struct Camera *c);
+void enemy_render(struct Enemy *e, uint32_t *scr, float *zbuf, struct Camera *c);
 void enemy_move(struct Enemy *e, SDL_Renderer *rend, Vec3f v);
 
 bool enemy_ray_intersect(struct Enemy *e, Vec3f o, Vec3f dir, float *t);

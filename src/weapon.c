@@ -34,9 +34,9 @@ void weapon_move(struct Weapon *w, struct Camera *c)
 }
 
 
-void weapon_render(struct Weapon *w, uint32_t *scr, struct Camera *c)
+void weapon_render(struct Weapon *w, uint32_t *scr, float *zbuf, struct Camera *c)
 {
-    mesh_render(w->mesh, scr, c);
+    mesh_render(w->mesh, scr, zbuf, c);
 }
 
 

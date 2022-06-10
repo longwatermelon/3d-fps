@@ -108,7 +108,7 @@ SDL_Texture *render_text(SDL_Renderer *rend, TTF_Font *font, const char *s)
 }
 
 
-void render_filled_tri(SDL_Point p[3], float z[3], uint32_t *screen, SDL_Color col)
+void render_filled_tri(SDL_Point p[3], float z[3], uint32_t *screen, float *zbuf, SDL_Color col)
 {
     SDL_Point p0 = p[0], p1 = p[1], p2 = p[2];
     float z0 = z[0], z1 = z[1], z2 = z[2];
@@ -139,8 +139,8 @@ void render_filled_tri(SDL_Point p[3], float z[3], uint32_t *screen, SDL_Color c
     RTI *r01 = rti_alloc(p0.x, z0, s10, (float)(z1 - z0) / (p1.y - p0.y));
     RTI *r12 = rti_alloc(p1.x, z1, s21, (float)(z2 - z1) / (p2.y - p1.y));
 
-    render_fill_edges(p0.y, p1.y, r02, r01, screen, col);
-    render_fill_edges(p1.y, p2.y, r02, r12, screen, col);
+    render_fill_edges(p0.y, p1.y, r02, r01, screen, zbuf, col);
+    render_fill_edges(p1.y, p2.y, r02, r12, screen, zbuf, col);
 
     rti_free(r02);
     rti_free(r01);
@@ -148,30 +148,46 @@ void render_filled_tri(SDL_Point p[3], float z[3], uint32_t *screen, SDL_Color c
 }
 
 
-void render_fill_edges(int top, int bot, RTI *l1, RTI *l2, uint32_t *screen, SDL_Color col)
+void render_fill_edges(int top, int bot, RTI *l1, RTI *l2, uint32_t *screen, float *zbuf, SDL_Color col)
 {
     for (int y = top; y < bot; ++y)
     {
         int min = roundf(l1->x > l2->x ? l2->x : l1->x);
         int max = roundf(l1->x > l2->x ? l1->x : l2->x);
 
+        float z = l1->z;
+        float sz = (l2->z - l1->z) / (l2->x - l1->x);
+
         for (int i = min; i < max; ++i)
         {
+            z += sz;
+
             if (i < 0)
             {
+                z += sz * -i;
                 i = 0;
                 continue;
             }
+
             if (i > 800) break;
 
             int idx = y * 800 + i;
 
             if (idx >= 0 && idx < 800 * 800)
-                screen[idx] = 0x00000000 | col.r << 16 | col.g << 8 | col.b;
+            {
+                if (z < zbuf[idx])
+                {
+                    screen[idx] = 0x00000000 | col.r << 16 | col.g << 8 | col.b;
+                    zbuf[idx] = z;
+                }
+            }
         }
 
         l1->x += 1.f / l1->sx;
         l2->x += 1.f / l2->sx;
+
+        l1->z += l1->sz;
+        l2->z += l2->sz;
     }
 }
 

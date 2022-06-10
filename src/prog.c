@@ -429,12 +429,12 @@ void prog_player(struct Prog *p)
 void prog_render(struct Prog *p)
 {
     for (size_t i = 0; i < p->nsolids; ++i)
-        mesh_render(p->solids[i], p->scr, p->player->cam);
+        mesh_render(p->solids[i], p->scr, p->zbuf, p->player->cam);
 
     for (size_t i = 0; i < p->nenemies; ++i)
-        enemy_render(p->enemies[i], p->scr, p->player->cam);
+        enemy_render(p->enemies[i], p->scr, p->zbuf, p->player->cam);
 
-    player_render(p->player, p->rend, p->scr, p->font);
+    player_render(p->player, p->rend, p->scr, p->zbuf, p->font);
 
     if (p->player->scoped)
     {
@@ -495,7 +495,7 @@ void prog_reset_buffers(struct Prog *p)
     for (int i = 0; i < 800 * 800; ++i)
     {
         p->scr[i] = 0x00000000;
-        p->zbuf[i] = INFINITY;
+        p->zbuf[i] = 1e5f;
     }
 }
 

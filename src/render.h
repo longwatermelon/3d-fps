@@ -20,8 +20,8 @@ Vec3f render_rotate_cc(Vec3f p, Vec3f angle);
 
 SDL_Texture *render_text(SDL_Renderer *rend, TTF_Font *font, const char *s);
 
-void render_filled_tri(SDL_Point p[3], float z[3], uint32_t *screen, SDL_Color col);
-void render_fill_edges(int top, int bot, RTI *l1, RTI *l2, uint32_t *screen, SDL_Color col);
+void render_filled_tri(SDL_Point p[3], float z[3], uint32_t *screen, float *zbuf, SDL_Color col);
+void render_fill_edges(int top, int bot, RTI *l1, RTI *l2, uint32_t *screen, float *zbuf, SDL_Color col);
 
 #endif
 
