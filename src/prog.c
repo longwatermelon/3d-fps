@@ -359,20 +359,20 @@ void prog_enemies(struct Prog *p)
             memmove(p->enemies + i, p->enemies + i + 1, (--p->nenemies - i) * sizeof(struct Enemy*));
         }
 
-        if (p->enemies[i]->type == ENEMY_DODGE)
-        {
-            float t;
-            Vec3f pdir = render_rotate_cc((Vec3f){ 0.f, 0.f, 1.f }, p->player->cam->angle);
+        /* if (p->enemies[i]->type == ENEMY_DODGE) */
+        /* { */
+        /*     float t; */
+        /*     Vec3f pdir = render_rotate_cc((Vec3f){ 0.f, 0.f, 1.f }, p->player->cam->angle); */
 
-            if (p->player->knife_thrown && enemy_ray_intersect(p->enemies[i], p->player->cam->pos, pdir, &t))
-            {
-                if (vec_dot(vec_sub(p->enemies[i]->body[0]->pos, p->player->cam->pos), pdir) >= 0.f)
-                {
-                    Vec3f dst = vec_addv(p->player->cam->pos, vec_mulf(pdir, -10.f));
-                    enemy_move(p->enemies[i], p->rend, vec_sub(dst, p->enemies[i]->pos));
-                }
-            }
-        }
+        /*     if (p->player->knife_thrown && enemy_ray_intersect(p->enemies[i], p->player->cam->pos, pdir, &t)) */
+        /*     { */
+        /*         if (vec_dot(vec_sub(p->enemies[i]->body[0]->pos, p->player->cam->pos), pdir) >= 0.f) */
+        /*         { */
+        /*             Vec3f dst = vec_addv(p->player->cam->pos, vec_mulf(pdir, -10.f)); */
+        /*             enemy_move(p->enemies[i], p->rend, vec_sub(dst, p->enemies[i]->pos)); */
+        /*         } */
+        /*     } */
+        /* } */
 
         if (p->enemies[i]->type == ENEMY_THROW)
         {
@@ -456,15 +456,21 @@ void prog_player(struct Prog *p)
 
         for (size_t i = 0; i < p->nenemies; ++i)
         {
-            if (p->enemies[i]->type == ENEMY_DODGE)
-                continue;
-
             float t;
 
             if (enemy_ray_intersect(p->enemies[i], p->player->knife_throw_origin, dir, &t))
             {
                 if (t <= dist)
-                    p->score += enemy_hurt(p->enemies[i], 5);
+                {
+                    if (p->enemies[i]->type == ENEMY_DODGE)
+                    {
+                        enemy_move(p->enemies[i], p->rend, vec_sub(vec_addv(p->player->cam->pos, vec_mulf(render_rotate_cc((Vec3f){ 0.f, 0.f, 1.f }, p->player->cam->angle), -10.f)), p->enemies[i]->pos));
+                    }
+                    else
+                    {
+                        p->score += enemy_hurt(p->enemies[i], 5);
+                    }
+                }
             }
         }
 
