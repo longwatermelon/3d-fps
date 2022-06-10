@@ -109,10 +109,10 @@ float render_fill_edges(float x1, float x2, int top, int bot, float s1, float s2
     {
         /* x1 = fmin(fmax(x1, 0.f), 800.f); */
         /* x2 = fmin(fmax(x2, 0.f), 800.f); */
-        float min = x1 > x2 ? x2 : x1;
-        float max = x1 > x2 ? x1 : x2;
+        int min = roundf(x1 > x2 ? x2 : x1);
+        int max = roundf(x1 > x2 ? x1 : x2);
 
-        for (float i = roundf(min); i < roundf(max); ++i)
+        for (int i = min; i < max; ++i)
         {
             if (i < 0)
             {
@@ -121,7 +121,7 @@ float render_fill_edges(float x1, float x2, int top, int bot, float s1, float s2
             }
             if (i > 800) break;
 
-            int idx = y * 800 + (int)i;
+            int idx = y * 800 + i;
 
             if (idx >= 0 && idx < 800 * 800)
                 screen[idx] = 0x00000000 | col.r << 16 | col.g << 8 | col.b;
