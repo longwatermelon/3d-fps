@@ -119,8 +119,10 @@ void mesh_render(struct Mesh *m, uint32_t *scr, struct Camera *c)
             vec_addv(render_rotate_cc(m->pts[m->tris[i].idx[2]], m->rot), m->pos)
         };
 
+        Vec3f norm = render_rotate_cc(m->norms[m->tris[i].nidx], m->rot);
+
         float tri_dist = vec_len(vec_sub(c->pos, mpts[0]));
-        if (tri_dist > 20.f)
+        if (tri_dist > 100.f)
             continue;
 
         if (m->bculling)
@@ -128,7 +130,7 @@ void mesh_render(struct Mesh *m, uint32_t *scr, struct Camera *c)
             Vec3f v = mpts[0];
             Vec3f vp = vec_sub(v, c->pos);
 
-            if (vec_dot(vp, render_rotate_cc(m->norms[m->tris[i].nidx], m->rot)) >= 0.f)
+            if (vec_dot(vp, norm) >= 0.f)
                 continue;
         }
 
@@ -154,8 +156,20 @@ void mesh_render(struct Mesh *m, uint32_t *scr, struct Camera *c)
 
         if (render)
         {
-            float mul = 1.f - fmin(fmax(tri_dist / 20.f, 0.f), 1.f);
-            render_filled_tri(points, scr, (SDL_Color){ mul * m->col.r, mul * m->col.g, mul * m->col.b });
+#if 0
+float dist = vec_len(vec_sub(sc->lights[i]->pos, hit));
+        float b = fmin(sc->lights[i]->in / (.005f * dist * dist), sc->lights[i]->in);
+
+        // diffuse
+        Vec3f l = vec_normalize(vec_sub(sc->lights[i]->pos, hit));
+        dlight += b * fmax(0.f, vec_dot(l, norm));
+#endif
+            float b = fmin(.8f / (.005f * tri_dist * tri_dist), .8f);
+            Vec3f l = vec_normalize(vec_sub(c->pos, mpts[0]));
+            float dlight = b * fmax(0.f, vec_dot(l, norm));
+            SDL_Color col = { fmin(dlight * m->col.r, 255), fmin(dlight * m->col.g, 255), fmin(dlight * m->col.b, 255) };
+
+            render_filled_tri(points, scr, col);
             /* SDL_RenderDrawLine(rend, points[0].x, points[0].y, points[1].x, points[1].y); */
             /* SDL_RenderDrawLine(rend, points[0].x, points[0].y, points[2].x, points[2].y); */
             /* SDL_RenderDrawLine(rend, points[1].x, points[1].y, points[2].x, points[2].y); */

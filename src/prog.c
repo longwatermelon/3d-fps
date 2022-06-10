@@ -343,7 +343,6 @@ void prog_enemies(struct Prog *p)
         }
     }
 
-#if 0
     if (rand() % 300 < 5 && p->nenemies < 3)
     {
         p->enemies = realloc(p->enemies, sizeof(struct Enemy*) * ++p->nenemies);
@@ -360,7 +359,6 @@ void prog_enemies(struct Prog *p)
 
         p->enemies[p->nenemies - 1] = enemy_alloc((Vec3f){ rand() % 40 - 20, rand() % 40 - 20, rand() % 40 - 20 }, type);
     }
-#endif
 
     for (size_t i = 0; i < p->nenemies; ++i)
     {
