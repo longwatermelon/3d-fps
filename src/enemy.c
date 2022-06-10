@@ -84,7 +84,7 @@ void enemy_free(struct Enemy *e)
 }
 
 
-void enemy_render(struct Enemy *e, uint32_t *scr, float *zbuf, struct Camera *c)
+void enemy_render(struct Enemy *e, RenderInfo *ri, struct Camera *c)
 {
     for (size_t i = 0; i < e->nbody; ++i)
     {
@@ -143,7 +143,7 @@ void enemy_render(struct Enemy *e, uint32_t *scr, float *zbuf, struct Camera *c)
     }
 
     for (size_t i = 0; i < e->nbody; ++i)
-        mesh_render(e->body[i], scr, zbuf, c);
+        mesh_render(e->body[i], ri, c);
 }
 
 

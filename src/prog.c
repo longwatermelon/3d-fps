@@ -12,12 +12,11 @@ struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r)
     p->restart = false;
 
     p->window = w;
-    p->rend = r;
+    p->ri = (RenderInfo){ .rend = r, .font = TTF_OpenFont("res/font.ttf", 16),
+        .lights = 0, .nlights = 0 };
 
     p->scrtex = SDL_CreateTexture(r, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, 800, 800);
     prog_reset_buffers(p);
-
-    p->font = TTF_OpenFont("res/font.ttf", 16);
 
     SDL_WarpMouseInWindow(p->window, 400, 400);
     SDL_ShowCursor(SDL_FALSE);
@@ -33,6 +32,11 @@ struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r)
 
     p->score = 0;
 
+    p->ri.nlights = 2;
+    p->ri.lights = malloc(sizeof(struct Light) * p->ri.nlights);
+    p->ri.lights[0] = p->player->light;
+    p->ri.lights[1] = p->player->gun_light;
+
     return p;
 }
 
@@ -40,8 +44,6 @@ struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r)
 void prog_free(struct Prog *p)
 {
     audio_stop_music();
-
-    TTF_CloseFont(p->font);
 
     player_free(p->player);
 
@@ -56,6 +58,7 @@ void prog_free(struct Prog *p)
     free(p->enemies);
 
     SDL_DestroyTexture(p->scrtex);
+    ri_free(&p->ri);
 
     free(p);
 }
@@ -114,36 +117,36 @@ void prog_mainloop(struct Prog *p)
 
         audio_stop_finished_sounds();
 
-        SDL_RenderClear(p->rend);
+        SDL_RenderClear(p->ri.rend);
 
         prog_render(p);
 
-        SDL_UpdateTexture(p->scrtex, 0, p->scr, 800 * sizeof(uint32_t));
-        SDL_RenderCopy(p->rend, p->scrtex, 0, 0);
+        SDL_UpdateTexture(p->scrtex, 0, p->ri.scr, 800 * sizeof(uint32_t));
+        SDL_RenderCopy(p->ri.rend, p->scrtex, 0, 0);
 
         {
             if (p->player->scoped)
             {
-                SDL_SetRenderDrawColor(p->rend, 255, 255, 255, 255);
-                SDL_RenderDrawLine(p->rend, 400 - 10, 400 - 10, 400 + 10, 400 + 10);
-                SDL_RenderDrawLine(p->rend, 400 + 10, 400 - 10, 400 - 10, 400 + 10);
+                SDL_SetRenderDrawColor(p->ri.rend, 255, 255, 255, 255);
+                SDL_RenderDrawLine(p->ri.rend, 400 - 10, 400 - 10, 400 + 10, 400 + 10);
+                SDL_RenderDrawLine(p->ri.rend, 400 + 10, 400 - 10, 400 - 10, 400 + 10);
             }
 
             if (clock() - p->player->last_hurt < CLOCKS_PER_SEC && clock() > CLOCKS_PER_SEC)
             {
-                SDL_SetRenderDrawBlendMode(p->rend, SDL_BLENDMODE_BLEND);
-                SDL_SetRenderDrawColor(p->rend, 255, 0, 0, (1.f - (float)(clock() - p->player->last_hurt) / (float)CLOCKS_PER_SEC) * 255.f);
-                SDL_RenderFillRect(p->rend, 0);
-                SDL_SetRenderDrawBlendMode(p->rend, SDL_BLENDMODE_NONE);
+                SDL_SetRenderDrawBlendMode(p->ri.rend, SDL_BLENDMODE_BLEND);
+                SDL_SetRenderDrawColor(p->ri.rend, 255, 0, 0, (1.f - (float)(clock() - p->player->last_hurt) / (float)CLOCKS_PER_SEC) * 255.f);
+                SDL_RenderFillRect(p->ri.rend, 0);
+                SDL_SetRenderDrawBlendMode(p->ri.rend, SDL_BLENDMODE_NONE);
             }
 
             char s[100] = { 0 };
             sprintf(s, "Health: %d", p->player->health);
 
-            SDL_Texture *tex = render_text(p->rend, p->font, s);
+            SDL_Texture *tex = render_text(p->ri.rend, p->ri.font, s);
             SDL_Rect r = { 20, 30 };
             SDL_QueryTexture(tex, 0, 0, &r.w, &r.h);
-            SDL_RenderCopy(p->rend, tex, 0, &r);
+            SDL_RenderCopy(p->ri.rend, tex, 0, &r);
 
             SDL_DestroyTexture(tex);
         }
@@ -152,32 +155,32 @@ void prog_mainloop(struct Prog *p)
             char score[100] = { 0 };
             sprintf(score, "Score: %d", p->score);
 
-            SDL_Texture *tex = render_text(p->rend, p->font, score);
+            SDL_Texture *tex = render_text(p->ri.rend, p->ri.font, score);
             SDL_Rect r = { 20, 60 };
             SDL_QueryTexture(tex, 0, 0, &r.w, &r.h);
 
-            SDL_RenderCopy(p->rend, tex, 0, &r);
+            SDL_RenderCopy(p->ri.rend, tex, 0, &r);
             SDL_DestroyTexture(tex);
         }
 
         if (p->player->health <= 0)
         {
-            SDL_SetRenderDrawColor(p->rend, 0, 0, 0, 100);
-            SDL_SetRenderDrawBlendMode(p->rend, SDL_BLENDMODE_BLEND);
-            SDL_RenderFillRect(p->rend, 0);
-            SDL_SetRenderDrawBlendMode(p->rend, SDL_BLENDMODE_NONE);
+            SDL_SetRenderDrawColor(p->ri.rend, 0, 0, 0, 100);
+            SDL_SetRenderDrawBlendMode(p->ri.rend, SDL_BLENDMODE_BLEND);
+            SDL_RenderFillRect(p->ri.rend, 0);
+            SDL_SetRenderDrawBlendMode(p->ri.rend, SDL_BLENDMODE_NONE);
 
-            SDL_Texture *tex = render_text(p->rend, p->font, "Press [q] to restart");
+            SDL_Texture *tex = render_text(p->ri.rend, p->ri.font, "Press [q] to restart");
             SDL_Rect r;
             SDL_QueryTexture(tex, 0, 0, &r.w, &r.h);
             r.x = 400 - (r.w / 2);
             r.y = 400 - (r.h / 2);
-            SDL_RenderCopy(p->rend, tex, 0, &r);
+            SDL_RenderCopy(p->ri.rend, tex, 0, &r);
             SDL_DestroyTexture(tex);
         }
 
-        SDL_SetRenderDrawColor(p->rend, 0, 0, 0, 255);
-        SDL_RenderPresent(p->rend);
+        SDL_SetRenderDrawColor(p->ri.rend, 0, 0, 0, 255);
+        SDL_RenderPresent(p->ri.rend);
 
         prog_reset_buffers(p);
 
@@ -260,6 +263,7 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
                 p->player->gun->mesh->rot.y += .2f;
 
                 audio_play_sound("res/sfx/gunshot.wav");
+                p->player->gun_light->in = 10.f;
 
                 if (hit)
                     p->score += enemy_hurt(e, 1);
@@ -409,7 +413,7 @@ void prog_enemies(struct Prog *p)
         else
             move = vec_divf(vec_normalize(vec_sub(p->player->cam->pos, p->enemies[i]->pos)), 10.f);
 
-        enemy_move(p->enemies[i], p->rend, move);
+        enemy_move(p->enemies[i], p->ri.rend, move);
     }
 }
 
@@ -457,7 +461,7 @@ void prog_player(struct Prog *p)
                 {
                     if (p->enemies[i]->type == ENEMY_DODGE)
                     {
-                        enemy_move(p->enemies[i], p->rend, vec_sub(vec_addv(p->player->cam->pos, vec_mulf(render_rotate_cc((Vec3f){ 0.f, 0.f, 1.f }, p->player->cam->angle), -10.f)), p->enemies[i]->pos));
+                        enemy_move(p->enemies[i], p->ri.rend, vec_sub(vec_addv(p->player->cam->pos, vec_mulf(render_rotate_cc((Vec3f){ 0.f, 0.f, 1.f }, p->player->cam->angle), -10.f)), p->enemies[i]->pos));
                     }
                     else
                     {
@@ -475,12 +479,12 @@ void prog_player(struct Prog *p)
 void prog_render(struct Prog *p)
 {
     for (size_t i = 0; i < p->nsolids; ++i)
-        mesh_render(p->solids[i], p->scr, p->zbuf, p->player->cam);
+        mesh_render(p->solids[i], &p->ri, p->player->cam);
 
     for (size_t i = 0; i < p->nenemies; ++i)
-        enemy_render(p->enemies[i], p->scr, p->zbuf, p->player->cam);
+        enemy_render(p->enemies[i], &p->ri, p->player->cam);
 
-    player_render(p->player, p->rend, p->scr, p->zbuf, p->font);
+    player_render(p->player, &p->ri);
 }
 
 
@@ -523,8 +527,8 @@ void prog_reset_buffers(struct Prog *p)
 {
     for (int i = 0; i < 800 * 800; ++i)
     {
-        p->scr[i] = 0x00000000;
-        p->zbuf[i] = 1e5f;
+        p->ri.scr[i] = 0x00000000;
+        p->ri.zbuf[i] = 1e5f;
     }
 }
 

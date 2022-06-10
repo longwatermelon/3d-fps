@@ -2,6 +2,15 @@
 #include <stdio.h>
 #include <math.h>
 
+void ri_free(RenderInfo *ri)
+{
+    TTF_CloseFont(ri->font);
+
+    for (size_t i = 0; i < ri->nlights; ++i)
+        light_free(ri->lights[i]);
+
+    free(ri->lights);
+}
 
 Vec3f util_matmul(float mat[3][3], Vec3f p)
 {

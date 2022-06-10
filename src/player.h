@@ -4,6 +4,7 @@
 #include "vector.h"
 #include "mesh.h"
 #include "weapon.h"
+#include "light.h"
 #include <time.h>
 #include <sys/types.h>
 #include <SDL2/SDL_ttf.h>
@@ -24,6 +25,8 @@ struct Player
     int health;
 
     clock_t last_hurt;
+
+    struct Light *light, *gun_light;
 };
 
 struct Player *player_alloc();
@@ -33,7 +36,7 @@ void player_move(struct Player *p, struct Mesh **solids, size_t nsolids);
 bool player_move_dir(struct Player *p, Vec3f dir, struct Mesh **solids, size_t nsolids, float bound);
 bool player_check_dir(struct Player *p, Vec3f dir, struct Mesh **solids, size_t nsolids, float bound, float *min);
 
-void player_render(struct Player *p, SDL_Renderer *rend, uint32_t *scr, float *zbuf, TTF_Font *font);
+void player_render(struct Player *p, RenderInfo *ri);
 void player_animate_weapon(struct Player *p);
 
 void player_hurt(struct Player *p, int damage);

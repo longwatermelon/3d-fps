@@ -14,13 +14,9 @@ struct Prog
     bool restart;
 
     SDL_Window *window;
-    SDL_Renderer *rend;
+    RenderInfo ri;
 
     SDL_Texture *scrtex;
-    uint32_t scr[800 * 800];
-    float zbuf[800 * 800];
-
-    TTF_Font *font;
 
     bool focused;
 

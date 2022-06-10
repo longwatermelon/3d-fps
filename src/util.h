@@ -2,6 +2,22 @@
 #define UTIL_H
 
 #include "vector.h"
+#include "light.h"
+#include <sys/types.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+
+typedef struct
+{
+    SDL_Renderer *rend;
+    TTF_Font *font;
+    struct Light **lights;
+    size_t nlights;
+    uint32_t scr[800 * 800];
+    float zbuf[800 * 800];
+} RenderInfo;
+
+void ri_free(RenderInfo *ri);
 
 Vec3f util_matmul(float mat[3][3], Vec3f p);
 

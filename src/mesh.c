@@ -107,7 +107,7 @@ void mesh_read(struct Mesh *m, const char *fp)
 }
 
 
-void mesh_render(struct Mesh *m, uint32_t *scr, float *zbuf, struct Camera *c)
+void mesh_render(struct Mesh *m, RenderInfo *ri, struct Camera *c)
 {
     for (size_t i = 0; i < m->ntris; ++i)
     {
@@ -157,25 +157,35 @@ void mesh_render(struct Mesh *m, uint32_t *scr, float *zbuf, struct Camera *c)
 
         if (render)
         {
-            float b = fmin(.8f / (.005f * tri_dist * tri_dist), .8f);
-            Vec3f l = vec_normalize(vec_sub(c->pos, mpts[0]));
-            float dlight = b * fmax(0.f, vec_dot(l, norm));
+            float dlight = 0.f, slight = 0.f;
 
-            if (dlight == 0.f)
+            for (size_t i = 0; i < ri->nlights; ++i)
             {
-                dlight = b * fmax(0.f, vec_dot(l, vec_mulf(norm, -1.f)));
+                if (ri->lights[i]->in == 0.f)
+                    continue;
+
+                float b = fmin(ri->lights[i]->in / (.005f * tri_dist * tri_dist), ri->lights[i]->in);
+                Vec3f l = vec_normalize(vec_sub(c->pos, mpts[0]));
+                dlight += b * fmax(0.f, vec_dot(l, norm));
+
+                if (dlight == 0.f)
+                {
+                    norm = vec_mulf(norm, -1.f);
+                    dlight = b * fmax(0.f, vec_dot(l, norm));
+                }
+
+                Vec3f r = vec_sub(l, vec_mulf(vec_mulf(norm, 2.f), vec_dot(l, norm)));
+                slight += b * powf(fmax(0.f, vec_dot(r, vec_normalize(mpts[0]))), 90.f);
             }
 
             if (dlight > .01f)
             {
-                Vec3f r = vec_sub(l, vec_mulf(vec_mulf(norm, 2.f), vec_dot(l, norm)));
-                float slight = b * powf(fmax(0.f, vec_dot(r, vec_normalize(mpts[0]))), 90.f);
                 SDL_Color col = {
                     fmin(slight + dlight * m->col.r, 255),
                     fmin(slight + dlight * m->col.g, 255),
                     fmin(slight + dlight * m->col.b, 255)
                 };
-                render_filled_tri(points, zvals, scr, zbuf, col);
+                render_filled_tri(points, zvals, ri->scr, ri->zbuf, col);
             }
         }
     }

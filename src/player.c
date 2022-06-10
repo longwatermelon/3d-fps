@@ -23,6 +23,9 @@ struct Player *player_alloc()
     p->health = 5;
     p->last_hurt = 0;
 
+    p->light = light_alloc(p->cam->pos, .8f);
+    p->gun_light = light_alloc(vec_addv(p->gun->pos, (Vec3f){ 0.f, 0.f, 1.f }), 0.f);
+
     return p;
 }
 
@@ -52,6 +55,11 @@ void player_move(struct Player *p, struct Mesh **solids, size_t nsolids)
 
     weapon_move(p->weapon, p->cam);
     player_animate_weapon(p);
+
+    p->light->pos = p->cam->pos;
+    p->gun_light->pos = vec_addv(p->gun->pos, (Vec3f){ 0.f, 0.f, 1.f });
+
+    p->gun_light->in -= p->gun_light->in / 5.f;
 }
 
 
@@ -106,9 +114,9 @@ bool player_check_dir(struct Player *p, Vec3f dir, struct Mesh **solids, size_t 
 }
 
 
-void player_render(struct Player *p, SDL_Renderer *rend, uint32_t *scr, float *zbuf, TTF_Font *font)
+void player_render(struct Player *p, RenderInfo *ri)
 {
-    weapon_render(p->weapon, scr, zbuf, p->cam);
+    weapon_render(p->weapon, ri, p->cam);
 }
 
 
