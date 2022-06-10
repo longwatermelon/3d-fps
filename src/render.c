@@ -117,13 +117,9 @@ void render_filled_tri(SDL_Point p[3], float z[3], uint32_t *screen, float *zbuf
         swapf(z1, z2);
     }
 
-    float s10 = (float)(p1.y - p0.y) / (p1.x - p0.x);
-    float s20 = (float)(p2.y - p0.y) / (p2.x - p0.x);
-    float s21 = (float)(p2.y - p1.y) / (p2.x - p1.x);
-
-    g_r02 = (RTI){ .x = p0.x, .z = z0, .sx = s20, .sz = (float)(z2 - z0) / (p2.y - p0.y) };
-    g_r01 = (RTI){ .x = p0.x, .z = z0, .sx = s10, .sz = (float)(z1 - z0) / (p1.y - p0.y) };
-    g_r12 = (RTI){ .x = p1.x, .z = z1, .sx = s21, .sz = (float)(z2 - z1) / (p2.y - p1.y) };
+    g_r02 = (RTI){ .x = p0.x, .z = z0, .sx = (float)(p2.y - p0.y) / (p2.x - p0.x), .sz = (float)(z2 - z0) / (p2.y - p0.y) };
+    g_r01 = (RTI){ .x = p0.x, .z = z0, .sx = (float)(p1.y - p0.y) / (p1.x - p0.x), .sz = (float)(z1 - z0) / (p1.y - p0.y) };
+    g_r12 = (RTI){ .x = p1.x, .z = z1, .sx = (float)(p2.y - p1.y) / (p2.x - p1.x), .sz = (float)(z2 - z1) / (p2.y - p1.y) };
 
     render_fill_edges(p0.y, p1.y, &g_r02, &g_r01, screen, zbuf, col);
     render_fill_edges(p1.y, p2.y, &g_r02, &g_r12, screen, zbuf, col);
