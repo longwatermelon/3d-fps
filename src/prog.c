@@ -497,7 +497,7 @@ void prog_player(struct Prog *p)
                 if (t <= knife_move)
                 {
                     move = false;
-                    tri_dist = t - 1.f;
+                    tri_dist = t - .8f;
                     break;
                 }
             }
