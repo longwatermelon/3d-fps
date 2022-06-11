@@ -154,10 +154,10 @@ void prog_mainloop(struct Prog *p)
                 SDL_RenderDrawLine(p->ri.rend, 400 + 10, 400 - 10, 400 - 10, 400 + 10);
             }
 
-            if (clock() - p->player->last_hurt < CLOCKS_PER_SEC && clock() > CLOCKS_PER_SEC)
+            if (SDL_GetTicks() - p->player->last_hurt < 1000 && SDL_GetTicks() > 1000)
             {
                 SDL_SetRenderDrawBlendMode(p->ri.rend, SDL_BLENDMODE_BLEND);
-                SDL_SetRenderDrawColor(p->ri.rend, 255, 0, 0, (1.f - (float)(clock() - p->player->last_hurt) / (float)CLOCKS_PER_SEC) * 255.f);
+                SDL_SetRenderDrawColor(p->ri.rend, 255, 0, 0, (1.f - (float)(SDL_GetTicks() - p->player->last_hurt) / 1000.f) * 255.f);
                 SDL_RenderFillRect(p->ri.rend, 0);
                 SDL_SetRenderDrawBlendMode(p->ri.rend, SDL_BLENDMODE_NONE);
             }
@@ -389,7 +389,7 @@ void prog_enemies(struct Prog *p)
 {
     for (size_t i = 0; i < p->nenemies; ++i)
     {
-        if (p->enemies[i]->dead && (clock() - p->enemies[i]->dead_time) / CLOCKS_PER_SEC >= 1)
+        if (p->enemies[i]->dead && (SDL_GetTicks() - p->enemies[i]->dead_time) >= 1000)
         {
             enemy_free(p->enemies[i]);
             memmove(p->enemies + i, p->enemies + i + 1, (--p->nenemies - i) * sizeof(struct Enemy*));

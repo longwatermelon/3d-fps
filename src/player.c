@@ -147,11 +147,11 @@ void player_animate_weapon(struct Player *p)
 
 void player_hurt(struct Player *p, int damage)
 {
-    if ((clock() - p->last_hurt) / CLOCKS_PER_SEC > 1)
+    if ((SDL_GetTicks() - p->last_hurt) > 1000)
     {
         audio_play_sound("res/sfx/player_damage.wav");
         p->health -= damage;
-        p->last_hurt = clock();
+        p->last_hurt = SDL_GetTicks();
     }
 }
 

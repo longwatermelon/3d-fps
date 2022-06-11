@@ -54,7 +54,7 @@ struct Enemy *enemy_alloc(Vec3f pos, int type)
 
     memset(e->thrown, 0, sizeof(struct Mesh*) * 5);
 
-    e->dead_time = clock();
+    e->dead_time = SDL_GetTicks();
     e->dead = false;
 
     e->dead_animations = malloc(sizeof(Vec3f) * e->nbody);
@@ -217,7 +217,7 @@ int enemy_hurt(struct Enemy *e, int damage)
     {
         audio_play_sound("res/sfx/explode.wav");
         e->dead = true;
-        e->dead_time = clock();
+        e->dead_time = SDL_GetTicks();
         
         switch (e->type)
         {

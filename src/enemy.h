@@ -18,7 +18,7 @@ struct Enemy
     int health;
     bool dead;
 
-    clock_t dead_time;
+    Uint32 dead_time;
     Vec3f *dead_animations;
 
     SDL_Color default_col;

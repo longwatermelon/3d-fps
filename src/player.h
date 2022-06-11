@@ -24,7 +24,7 @@ struct Player
 
     int health;
 
-    clock_t last_hurt;
+    Uint32 last_hurt;
 
     struct Light *light, *gun_light;
 };
