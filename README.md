@@ -11,7 +11,9 @@ First person shooter
 * 1: equip gun
 * 2: equip knife
 
-https://user-images.githubusercontent.com/73869536/173017282-020416db-fb55-4f4f-b90a-31075f5786f0.mp4
+
+https://user-images.githubusercontent.com/73869536/173174856-fe682b1f-32b9-437f-b715-c89d67fd1122.mp4
+
 
 # Building
 Dependencies: sdl2, sdl2_ttf, sdl2_mixer
