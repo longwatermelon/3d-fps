@@ -38,22 +38,22 @@ Vec3f render_rotate_ccw(Vec3f p, Vec3f angle)
     float rotx[3][3] = {
         { 1, 0, 0 },
         { 0, cosf(angle.y), -sinf(angle.y) },
-        { 0, sinf(angle.y), cosf(angle.y) }
+        { 0, -rotx[1][2], rotx[1][1] }
     };
 
     float roty[3][3] = {
         { cosf(angle.x), 0, sinf(angle.x) },
         { 0, 1, 0 },
-        { -sinf(angle.x), 0, cosf(angle.x) }
+        { -roty[0][2], 0, roty[0][0] }
     };
 
     float rotz[3][3] = {
         { cosf(angle.z), -sinf(angle.z), 0 },
-        { sinf(angle.z), cosf(angle.z), 0 },
+        { -rotz[0][1], rotz[0][0], 0 },
         { 0, 0, 1 }
     };
 
-    return util_matmul(rotz, util_matmul(rotx, util_matmul(roty, p)));
+    return util_matmul_rotation_opt(rotz, util_matmul_rotation_opt(rotx, util_matmul_rotation_opt(roty, p)));
 }
 
 
@@ -65,22 +65,22 @@ Vec3f render_rotate_cc(Vec3f p, Vec3f angle)
     float rotx[3][3] = {
         { 1, 0, 0 },
         { 0, cosf(angle.y), -sinf(angle.y) },
-        { 0, sinf(angle.y), cosf(angle.y) }
+        { 0, -rotx[1][2], rotx[1][1] }
     };
 
     float roty[3][3] = {
         { cosf(angle.x), 0, sinf(angle.x) },
         { 0, 1, 0 },
-        { -sinf(angle.x), 0, cosf(angle.x) }
+        { -roty[0][2], 0, roty[0][0] }
     };
 
     float rotz[3][3] = {
         { cosf(angle.z), -sinf(angle.z), 0 },
-        { sinf(angle.z), cosf(angle.z), 0 },
+        { -rotz[0][1], rotz[0][0], 0 },
         { 0, 0, 1 }
     };
 
-    return util_matmul(roty, util_matmul(rotx, util_matmul(rotz, p)));
+    return util_matmul_rotation_opt(roty, util_matmul_rotation_opt(rotx, util_matmul_rotation_opt(rotz, p)));
 }
 
 

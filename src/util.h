@@ -21,6 +21,8 @@ typedef struct
 void ri_free(RenderInfo *ri);
 
 Vec3f util_matmul(float mat[3][3], Vec3f p);
+// Optimized for rotation matrices
+Vec3f util_matmul_rotation_opt(float mat[3][3], Vec3f p);
 
 float util_tri_area(Vec3f points[3]);
 

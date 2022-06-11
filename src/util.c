@@ -24,6 +24,15 @@ Vec3f util_matmul(float mat[3][3], Vec3f p)
 }
 
 
+Vec3f util_matmul_rotation_opt(float mat[3][3], Vec3f p)
+{
+    if (mat[0][0] == 1 && mat[1][1] == 1 && mat[2][2] == 1)
+        return p;
+
+    return util_matmul(mat, p);
+}
+
+
 float util_tri_area(Vec3f points[3])
 {
     float a = vec_len(vec_sub(points[1], points[0]));
