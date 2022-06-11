@@ -115,11 +115,11 @@ bool player_check_dir(struct Player *p, Vec3f dir, struct Mesh **solids, size_t 
 }
 
 
-void player_render(struct Player *p, RenderInfo *ri, Vec3f shake)
+void player_render(struct Player *p, RenderInfo *ri)
 {
-    p->cam->pos = vec_sub(p->cam->pos, shake);
+    cam_reverse_eff(p->cam);
     weapon_render(p->weapon, ri, p->cam);
-    p->cam->pos = vec_addv(p->cam->pos, shake);
+    cam_apply_eff(p->cam);
 }
 
 

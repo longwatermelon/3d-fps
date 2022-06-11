@@ -37,7 +37,7 @@ void player_move(struct Player *p, struct Mesh **solids, size_t nsolids);
 bool player_move_dir(struct Player *p, Vec3f dir, struct Mesh **solids, size_t nsolids, float bound);
 bool player_check_dir(struct Player *p, Vec3f dir, struct Mesh **solids, size_t nsolids, float bound, float *min);
 
-void player_render(struct Player *p, RenderInfo *ri, Vec3f shake);
+void player_render(struct Player *p, RenderInfo *ri);
 void player_animate_weapon(struct Player *p);
 
 void player_hurt(struct Player *p, int damage);

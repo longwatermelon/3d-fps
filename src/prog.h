@@ -30,7 +30,6 @@ struct Prog
 
     int score;
 
-    Vec3f cam_shake;
     Uint32 shake_begin;
 };
 

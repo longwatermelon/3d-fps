@@ -37,7 +37,6 @@ struct Prog *prog_alloc(SDL_Window *w, SDL_Renderer *r)
     p->ri.lights[0] = p->player->light;
     p->ri.lights[1] = p->player->gun_light;
 
-    p->cam_shake = (Vec3f){ 0, 0, 0 };
     p->shake_begin = -100;
 
     return p;
@@ -122,25 +121,25 @@ void prog_mainloop(struct Prog *p)
 
         SDL_RenderClear(p->ri.rend);
 
-        p->player->cam->pos = vec_addv(p->player->cam->pos, p->cam_shake);
+        cam_apply_eff(p->player->cam);
         prog_render(p);
-        p->player->cam->pos = vec_sub(p->player->cam->pos, p->cam_shake);
+        cam_reverse_eff(p->player->cam);
 
         if (now - p->shake_begin < 40)
         {
-            p->cam_shake = vec_addv(p->cam_shake, (Vec3f){
+            p->player->cam->pos_eff = vec_addv(p->player->cam->pos_eff, (Vec3f){
                 (float)(rand() % 100 - 50) / 300,
                 -(float)(rand() % 50) / 300,
-                (float)(rand() % 100 - 50) / 300
+                -(float)(rand() % 50) / 300
             });
 
-            p->cam_shake.x = fmin(fmax(p->cam_shake.x, -3), 3);
-            p->cam_shake.y = fmin(fmax(p->cam_shake.y, -3), 3);
-            p->cam_shake.z = fmin(fmax(p->cam_shake.z, -3), 3);
+            p->player->cam->pos_eff.x = fmin(fmax(p->player->cam->pos_eff.x, -3), 3);
+            p->player->cam->pos_eff.y = fmin(fmax(p->player->cam->pos_eff.y, -3), 3);
+            p->player->cam->pos_eff.z = fmin(fmax(p->player->cam->pos_eff.z, -3), 3);
         }
         else
         {
-            p->cam_shake = (Vec3f){ 0, 0, 0 };
+            p->player->cam->pos_eff = (Vec3f){ 0, 0, 0 };
         }
 
         SDL_UpdateTexture(p->scrtex, 0, p->ri.scr, 800 * sizeof(uint32_t));
@@ -537,7 +536,7 @@ void prog_render(struct Prog *p)
     for (size_t i = 0; i < p->nenemies; ++i)
         enemy_render(p->enemies[i], &p->ri, p->player->cam);
 
-    player_render(p->player, &p->ri, p->cam_shake);
+    player_render(p->player, &p->ri);
 }
 
 
