@@ -288,7 +288,7 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
                 p->shake_begin = SDL_GetTicks();
 
                 if (hit)
-                    p->score += enemy_hurt(e, 1);
+                    p->score += enemy_hurt(e, 3);
             }
             else if (p->player->weapon == p->player->knife)
             {
