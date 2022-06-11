@@ -110,7 +110,7 @@ void prog_mainloop(struct Prog *p)
 
         for (size_t i = 0; i < p->nsolids; ++i)
         {
-            if (p->score >= 30)
+            if (p->score >= 100)
             {
                 p->solids[i]->rot.z += .007f;
                 p->solids[i]->rot.y += .003f;
@@ -205,7 +205,7 @@ void prog_mainloop(struct Prog *p)
 
         prog_reset_buffers(p);
 
-        if (p->score != prev_score && prev_score < 30 && p->score >= 30)
+        if (p->score != prev_score && prev_score < 100 && p->score >= 100)
         {
             audio_play_music("res/sfx/roll.wav");
             audio_play_sound("res/sfx/rotate.wav");

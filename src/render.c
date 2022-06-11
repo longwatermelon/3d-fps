@@ -152,7 +152,7 @@ void render_fill_edges(int top, int bot, RTI *l1, RTI *l2, uint32_t *screen, flo
                 continue;
             }
 
-            if (i > 800) break;
+            if (i >= 800) break;
 
             int idx = y * 800 + i;
 
