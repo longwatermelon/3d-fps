@@ -507,6 +507,9 @@ void prog_player(struct Prog *p)
 
         if (!move)
         {
+            if (vec_len(vec_sub(w->pos, w->mesh->pos)) > 0.f)
+                audio_play_sound("res/sfx/metal-impact.wav");
+
             w->mesh->pos = vec_addv(w->mesh->pos, vec_mulf(vec_normalize(vec_sub(w->pos, w->mesh->pos)), tri_dist));
             w->pos = w->mesh->pos;
         }
