@@ -21,6 +21,7 @@ struct Player
 
     bool knife_thrown;
     Vec3f knife_throw_origin;
+    Uint32 knife_thrown_time;
 
     int health;
 

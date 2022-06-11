@@ -302,6 +302,8 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
                     p->player->knife->pos = vec_addv(p->player->cam->pos, render_rotate_cc((Vec3f){ 0.f, 0.f, 90.f }, p->player->cam->angle));
                     p->player->knife->divisor = 10.f;
                     p->player->knife_throw_origin = p->player->cam->pos;
+
+                    p->player->knife_thrown_time = SDL_GetTicks();
                 }
             }
         }
@@ -444,20 +446,6 @@ void prog_enemies(struct Prog *p)
 
 void prog_player(struct Prog *p)
 {
-    player_move(p->player, p->solids, p->nsolids);
-
-    for (size_t i = 0; i < p->nenemies; ++i)
-    {
-        for (size_t j = 0; j < p->enemies[i]->nbody; ++j)
-        {
-            if (vec_len(vec_sub(p->player->cam->pos, p->enemies[i]->body[j]->pos)) <= 2.f)
-            {
-                if (!p->enemies[i]->dead)
-                    player_hurt(p->player, 1);
-            }
-        }
-    }
-
     if (p->player->knife_thrown)
     {
         struct Weapon *w = p->player->weapon;
@@ -495,7 +483,48 @@ void prog_player(struct Prog *p)
             }
         }
 
-        p->player->knife_throw_origin = vec_addv(p->player->knife_throw_origin, vec_mulf(dir, dist));
+        bool move = true;
+        float knife_move = vec_len(vec_divf(vec_sub(w->pos, w->mesh->pos), w->divisor));
+        float tri_dist = 0.f;
+
+        for (size_t i = 0; i < p->nsolids; ++i)
+        {
+            float t;
+            Triangle tri;
+
+            if (mesh_ray_intersect(p->solids[i], w->mesh->pos, vec_normalize(vec_sub(w->pos, w->mesh->pos)), &t, &tri))
+            {
+                if (t <= knife_move)
+                {
+                    move = false;
+                    tri_dist = t - 1.f;
+                    break;
+                }
+            }
+        }
+
+        if (move)
+            p->player->knife_throw_origin = vec_addv(p->player->knife_throw_origin, vec_mulf(dir, dist));
+
+        if (!move)
+        {
+            w->mesh->pos = vec_addv(w->mesh->pos, vec_mulf(vec_normalize(vec_sub(w->pos, w->mesh->pos)), tri_dist));
+            w->pos = w->mesh->pos;
+        }
+    }
+
+    player_move(p->player, p->solids, p->nsolids);
+
+    for (size_t i = 0; i < p->nenemies; ++i)
+    {
+        for (size_t j = 0; j < p->enemies[i]->nbody; ++j)
+        {
+            if (vec_len(vec_sub(p->player->cam->pos, p->enemies[i]->body[j]->pos)) <= 2.f)
+            {
+                if (!p->enemies[i]->dead)
+                    player_hurt(p->player, 1);
+            }
+        }
     }
 }
 

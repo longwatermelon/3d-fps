@@ -17,6 +17,7 @@ struct Player *player_alloc()
     p->knife = weapon_alloc("res/knife.obj", (Vec3f){ .35f, -.1f, .6f }, (Vec3f){ 0.f, 0.f, 0.f }, 5.f);
     p->knife_thrown = false;
     p->knife_throw_origin = (Vec3f){ 0.f, 0.f, 0.f };
+    p->knife_thrown_time = SDL_GetTicks();
 
     p->weapon = p->gun;
 
@@ -133,7 +134,7 @@ void player_animate_weapon(struct Player *p)
     }
     else if (p->weapon == p->knife)
     {
-        if (p->knife_thrown && vec_len(vec_sub(p->knife->mesh->pos, p->knife->pos)) <= 5.f)
+        if (p->knife_thrown && SDL_GetTicks() - p->knife_thrown_time > 1000)
         {
             p->knife->absolute = false;
             p->knife_thrown = false;
