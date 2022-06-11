@@ -126,7 +126,7 @@ void prog_mainloop(struct Prog *p)
         prog_render(p);
         p->player->cam->pos = vec_sub(p->player->cam->pos, p->cam_shake);
 
-        if (now - p->shake_begin < 70)
+        if (now - p->shake_begin < 40)
         {
             p->cam_shake = vec_addv(p->cam_shake, (Vec3f){
                 (float)(rand() % 100 - 50) / 300,
@@ -286,7 +286,7 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
 
                 audio_play_sound("res/sfx/gunshot.wav");
                 p->player->gun_light->in = 10.f;
-                p->shake_begin = SDL_GetTicks() + 50;
+                p->shake_begin = SDL_GetTicks();
 
                 if (hit)
                     p->score += enemy_hurt(e, 1);
