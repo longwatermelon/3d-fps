@@ -1,6 +1,8 @@
 # rasterize
 First person shooter
 
+**Warning: flashing lights**
+
 # Controls
 * WASD: movement
 * Space: jump
