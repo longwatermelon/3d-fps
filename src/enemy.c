@@ -111,8 +111,8 @@ void enemy_render(struct Enemy *e, RenderInfo *ri, struct Camera *c)
 
     if (e->type == ENEMY_NORMAL)
     {
-        e->body[0]->rot = vec_addv(e->body[0]->rot, (Vec3f){ .06f, .04f, .07f });
-        e->body[1]->rot = vec_addv(e->body[1]->rot, (Vec3f){ -.09f, .08f, -.04f });
+        mesh_rotate(e->body[0], (Vec3f){ .06f, .04f, .07f });
+        mesh_rotate(e->body[1], (Vec3f){ -.09f, .08f, -.04f });
     }
     else if (e->type == ENEMY_DODGE)
     {
@@ -125,7 +125,7 @@ void enemy_render(struct Enemy *e, RenderInfo *ri, struct Camera *c)
 
         for (size_t i = 0; i < e->nbody; ++i)
         {
-            e->body[i]->rot = vec_addv(e->body[i]->rot, (Vec3f){ .05f, -.1f, .02f });
+            mesh_rotate(e->body[i], (Vec3f){ .05f, -.1f, .02f });
 
             for (size_t j = 0; j < e->body[i]->npts; ++j)
             {
@@ -138,7 +138,7 @@ void enemy_render(struct Enemy *e, RenderInfo *ri, struct Camera *c)
     {
         for (size_t i = 0; i < e->nbody; ++i)
         {
-            e->body[i]->rot = vec_addv(e->body[i]->rot, (Vec3f){ .05f, .2f, .01f });
+            mesh_rotate(e->body[i], (Vec3f){ .05f, .2f, .01f });
         }
     }
 

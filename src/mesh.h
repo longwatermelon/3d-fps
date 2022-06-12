@@ -18,12 +18,14 @@ struct Mesh
     Vec3f pos;
     Vec3f rot;
 
+    Vec3f *opts;
     Vec3f *pts;
     size_t npts;
 
     Triangle *tris;
     size_t ntris;
-    
+
+    Vec3f *onorms;
     Vec3f *norms;
     size_t nnorms;
 
@@ -37,6 +39,8 @@ void mesh_free(struct Mesh *m);
 void mesh_read(struct Mesh *m, const char *fp);
 
 void mesh_render(struct Mesh *m, RenderInfo *ri, struct Camera *c);
+
+void mesh_rotate(struct Mesh *m, Vec3f angle);
 
 bool mesh_ray_intersect(struct Mesh *m, Vec3f ro, Vec3f rdir, float *t, Triangle *tri);
 bool mesh_ray_tri_intersect(struct Mesh *m, Triangle tri, Vec3f ro, Vec3f rdir, float *t);

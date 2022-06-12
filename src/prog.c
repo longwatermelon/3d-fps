@@ -112,8 +112,7 @@ void prog_mainloop(struct Prog *p)
         {
             if (p->score >= 100)
             {
-                p->solids[i]->rot.z += .007f;
-                p->solids[i]->rot.y += .003f;
+                mesh_rotate(p->solids[i], (Vec3f){ 0, .003f, .007f });
             }
         }
 
@@ -281,7 +280,7 @@ void prog_events_game(struct Prog *p, SDL_Event *evt)
                 struct Enemy *e = 0;
                 bool hit = prog_player_shoot(p, &e);
                 p->player->gun->mesh->pos.y -= .1f;
-                p->player->gun->mesh->rot.y += .2f;
+                mesh_rotate(p->player->gun->mesh, (Vec3f){ 0, .2f, 0 });
 
                 audio_play_sound("res/sfx/gunshot.wav");
                 p->player->gun_light->in = 10.f;
@@ -365,6 +364,9 @@ void prog_mouse(struct Prog *p)
 {
     SDL_Point mouse;
     SDL_GetMouseState(&mouse.x, &mouse.y);
+
+    /* p->player->cam->angle.x -= .01f; */
+    /* p->player->cam->angle.y -= .01f; */
 
     if (p->focused)
     {

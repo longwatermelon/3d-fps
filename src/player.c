@@ -167,7 +167,12 @@ void player_switch_weapon(struct Player *p, struct Weapon *weapon)
     p->weapon->absolute = false;
 
     weapon->mesh->pos = vec_addv(p->cam->pos, render_rotate_cc((Vec3f){ .5f, -.5f, 0.f }, p->cam->angle));
-    weapon->mesh->rot = vec_addv(p->cam->angle, (Vec3f){ 0.f, 1.f, 0.f });
+
+    Vec3f target = vec_addv(p->cam->angle, (Vec3f){ 0, 1, 0 });
+    Vec3f now = weapon->mesh->rot;
+    mesh_rotate(weapon->mesh, vec_sub(target, now));
+//    weapon->mesh->rot = vec_addv(p->cam->angle, (Vec3f){ 0.f, 1.f, 0.f });
+
     p->weapon->pos = p->weapon->default_pos;
     p->weapon = weapon;
 

@@ -30,7 +30,8 @@ void weapon_move(struct Weapon *w, struct Camera *c)
     w->mesh->pos = vec_addv(w->mesh->pos, vec_divf(vec_sub(pos, w->mesh->pos), w->divisor));
 
     if (!w->absolute)
-        w->mesh->rot = vec_addv(w->mesh->rot, vec_divf(vec_sub(vec_addv(c->angle, w->angle), w->mesh->rot), w->divisor));
+        mesh_rotate(w->mesh, vec_divf(vec_sub(vec_addv(c->angle, w->angle), w->mesh->rot), w->divisor));
+//        w->mesh->rot = vec_addv(w->mesh->rot, vec_divf(vec_sub(vec_addv(c->angle, w->angle), w->mesh->rot), w->divisor));
 }
 
 
